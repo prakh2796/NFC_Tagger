@@ -1,5 +1,6 @@
 package vibhor.prakhar.example.com.nfc_tagger;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity
     private ImageView imgNavHeaderBg, imgProfile;
     private TextView txtName, txtWebsite;
     private View navHeader;
+
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,6 +124,8 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            intent = new Intent(MainActivity.this, Settings.class);
+            startActivity(intent);
             return true;
         }
 
