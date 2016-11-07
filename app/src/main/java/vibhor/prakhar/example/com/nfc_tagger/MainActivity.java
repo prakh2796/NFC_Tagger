@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -19,6 +20,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.facebook.AccessToken;
+import com.facebook.login.LoginManager;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -27,6 +30,7 @@ public class MainActivity extends AppCompatActivity
 
     private static final String MY_PREFS_NAME = "USER_CREDENTIALS";
     private SharedPreferences sharedPreferences;
+    private SharedPreferences.Editor editor;
 
     private String name, email, profile_pic;
     private ImageView imgNavHeaderBg, imgProfile;
@@ -76,6 +80,7 @@ public class MainActivity extends AppCompatActivity
 //        txtName.setText(profile.getName());
 
         sharedPreferences = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
+        editor = sharedPreferences.edit();
         name = sharedPreferences.getString("name", "Username");
         email = sharedPreferences.getString("email", "ecommerce@ecomerce.com");
         profile_pic = sharedPreferences.getString("profile_pic", "https://lh3.googleusercontent.com/eCtE_G34M9ygdkmOpYvCag1vBARCmZwnVS6rS5t4JLzJ6QgQSBquM0nuTsCpLhYbKljoyS-txg");
@@ -127,6 +132,19 @@ public class MainActivity extends AppCompatActivity
             intent = new Intent(MainActivity.this, Settings.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_logout) {
+            if(isFBLoggedIn()) {
+                Log.e("prakhar","logout");
+                LoginManager.getInstance().logOut();
+                intent = new Intent(MainActivity.this, LoginActivity.class);
+                editor.putString("name", "null");
+                editor.putString("email", "null");
+                editor.putString("profile_pic", "null");
+                editor.commit();
+                startActivity(intent);
+                finish();
+            }
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -155,5 +173,10 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public boolean isFBLoggedIn() {
+        AccessToken accessToken = AccessToken.getCurrentAccessToken();
+        return accessToken == null;
     }
 }

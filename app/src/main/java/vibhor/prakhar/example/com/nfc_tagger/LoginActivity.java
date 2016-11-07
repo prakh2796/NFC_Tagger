@@ -32,6 +32,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -44,6 +45,15 @@ import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.Callback;
+import com.twitter.sdk.android.core.Result;
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterException;
+import com.twitter.sdk.android.core.TwitterSession;
+import com.twitter.sdk.android.core.identity.TwitterLoginButton;
+
+import io.fabric.sdk.android.Fabric;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -59,6 +69,11 @@ import static android.Manifest.permission.READ_CONTACTS;
  * A login screen that offers login via email/password.
  */
 public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<Cursor> {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "ZP39WOdr3mcfdJ05bOFgkD4Nv";
+    private static final String TWITTER_SECRET = "tC83vKtH3cOqiCSTSbAPaOmBtHTLacs2jTrECU7PKk7a3rMOH0";
+
 
     /**
      * Id to identity READ_CONTACTS permission request.
@@ -84,7 +99,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private View mLoginFormView;
 
     private CallbackManager callbackManager = null;
-    private LoginButton loginButton;
+    private LoginButton fbLoginButton;
+
+    private TwitterLoginButton twitterLoginButton;
+
 
     private  String name, email, profile_pic;
     private  URL imageURL;
@@ -98,6 +116,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new Twitter(authConfig));
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
         sharedPreferences = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
@@ -105,15 +125,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         name = sharedPreferences.getString("name", "null");
         if(!name.equals("null")){
-            launMainActivity();
+            launchMainActivity();
         }
 
         AppEventsLogger.activateApp(this);
         callbackManager = CallbackManager.Factory.create();
-        loginButton = (LoginButton) findViewById(R.id.login_button);
-        loginButton.setReadPermissions(Arrays.asList(
+        fbLoginButton = (LoginButton) findViewById(R.id.login_button);
+        fbLoginButton.setReadPermissions(Arrays.asList(
                 "public_profile", "email", "user_birthday"));
-        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+        fbLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 GraphRequest request = GraphRequest.newMeRequest
@@ -137,7 +157,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                                     editor.putString("email", email);
                                     editor.putString("profile_pic", profile_pic);
                                     editor.commit();
-                                    launMainActivity();
+                                    launchMainActivity();
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -158,6 +178,26 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
             }
         });
+
+        twitterLoginButton = (TwitterLoginButton) findViewById(R.id.twitter_login_button);
+        twitterLoginButton.setCallback(new Callback<TwitterSession>() {
+            @Override
+            public void success(Result<TwitterSession> result) {
+                // The TwitterSession is also available through:
+                // Twitter.getInstance().core.getSessionManager().getActiveSession()
+                TwitterSession session = result.data;
+                // TODO: Remove toast and use the TwitterSession's userID
+                // with your app's user model
+                String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
+                Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                launchMainActivity();
+            }
+            @Override
+            public void failure(TwitterException exception) {
+                Log.d("TwitterKit", "Login with Twitter failure", exception);
+            }
+        });
+
 
         // Set up the login form.
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
@@ -190,7 +230,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     @Override
     protected void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == TwitterAuthConfig.DEFAULT_AUTH_REQUEST_CODE){
+            //  twitter related handling
+            twitterLoginButton.onActivityResult(requestCode, resultCode, data);
+        } else{
+            // facebook related handling
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void populateAutoComplete() {
@@ -437,7 +483,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             showProgress(false);
 
             if (success) {
-                launMainActivity();
+                launchMainActivity();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
@@ -451,7 +497,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         }
     }
 
-    private void launMainActivity(){
+    private void launchMainActivity(){
         intent = new Intent(LoginActivity.this, MainActivity.class);
         startActivity(intent);
         finish();

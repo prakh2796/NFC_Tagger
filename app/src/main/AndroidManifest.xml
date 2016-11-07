@@ -34,7 +34,13 @@
 
         </activity>
 
-        <activity android:name=".Settings"/>
+        <activity
+            android:name=".Settings"
+            android:label="Settings"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="cdba87fdd5fe317507b97feab27da70dc579f1b3" />
     </application>
 
 </manifest>

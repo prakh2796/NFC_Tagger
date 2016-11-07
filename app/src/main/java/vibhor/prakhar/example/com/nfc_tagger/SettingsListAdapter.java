@@ -13,13 +13,13 @@ import java.util.List;
  * Created by Prakhar Gupta on 03/11/2016.
  */
 
-public class SettingsListdAdapter extends BaseAdapter {
+public class SettingsListAdapter extends BaseAdapter {
 
     private LayoutInflater inflater;
     private Context context;
     private List<SettingsRowItem> settingsRowItemList;
 
-    public SettingsListdAdapter(Context context, List<SettingsRowItem> settingsRowItemList) {
+    public SettingsListAdapter(Context context, List<SettingsRowItem> settingsRowItemList) {
         this.context = context;
         this.settingsRowItemList = settingsRowItemList;
     }
