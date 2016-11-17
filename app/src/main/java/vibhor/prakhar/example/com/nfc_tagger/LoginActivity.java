@@ -123,8 +123,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         sharedPreferences = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
-        name = sharedPreferences.getString("name", "null");
-        if(!name.equals("null")){
+        name = sharedPreferences.getString("name", "\0");
+        if(!name.equals("\0")){
             launchMainActivity();
         }
 
@@ -190,6 +190,8 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 // with your app's user model
                 String msg = "@" + session.getUserName() + " logged in! (#" + session.getUserId() + ")";
                 Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+                editor.putString("name", session.getUserName());
+                editor.commit();
                 launchMainActivity();
             }
             @Override

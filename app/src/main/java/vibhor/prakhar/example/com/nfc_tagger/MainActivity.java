@@ -1,5 +1,6 @@
 package vibhor.prakhar.example.com.nfc_tagger;
 
+import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -15,13 +16,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
+import com.twitter.sdk.android.Twitter;
+import com.twitter.sdk.android.core.TwitterCore;
+import com.twitter.sdk.android.core.TwitterSession;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -36,8 +43,9 @@ public class MainActivity extends AppCompatActivity
     private ImageView imgNavHeaderBg, imgProfile;
     private TextView txtName, txtWebsite;
     private View navHeader;
-
     private Intent intent;
+    private Fragment objFragment;
+    private Class fragmentClass;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +54,16 @@ public class MainActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
-//            }
-//        });
+                intent = new Intent(MainActivity.this, AddOrRemoveWallet.class);
+                startActivity(intent);
+            }
+        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -71,6 +81,13 @@ public class MainActivity extends AppCompatActivity
         imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
         loadNavHeader();
         navigationView.setNavigationItemSelectedListener(this);
+
+        Fragment objFragment=null;
+        fragmentClass = MyCards.class;
+        if (savedInstanceState == null) {
+            fragmentClass = MyCards.class;
+            loadFragment(fragmentClass);
+        }
 
     }
 
@@ -136,14 +153,20 @@ public class MainActivity extends AppCompatActivity
             if(isFBLoggedIn()) {
                 Log.e("prakhar","logout");
                 LoginManager.getInstance().logOut();
-                intent = new Intent(MainActivity.this, LoginActivity.class);
-                editor.putString("name", "null");
-                editor.putString("email", "null");
-                editor.putString("profile_pic", "null");
-                editor.commit();
-                startActivity(intent);
-                finish();
+            } else if(isTwitterLoggedIn()){
+                CookieSyncManager.createInstance(this);
+                CookieManager cookieManager = CookieManager.getInstance();
+                cookieManager.removeSessionCookie();
+                Twitter.getSessionManager().clearActiveSession();
+                Twitter.logOut();
             }
+            intent = new Intent(MainActivity.this, LoginActivity.class);
+            editor.putString("name", "\0");
+            editor.putString("email", "\0");
+            editor.putString("profile_pic", "\0");
+            editor.commit();
+            startActivity(intent);
+            finish();
             return true;
         }
 
@@ -157,7 +180,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_mycard) {
-
+            fragmentClass = MyCards.class;
         } else if (id == R.id.nav_profile) {
 
         } else if (id == R.id.nav_nfc_action) {
@@ -167,8 +190,20 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_email) {
+            intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("message/rfc822");
+            intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{"recipient@example.com"});
+            intent.putExtra(Intent.EXTRA_SUBJECT, "subject of email");
+            intent.putExtra(Intent.EXTRA_TEXT   , "body of email");
+            try {
+                startActivity(Intent.createChooser(intent, "Send mail..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(MainActivity.this, "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+            }
 
         }
+
+        loadFragment(fragmentClass);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -178,5 +213,20 @@ public class MainActivity extends AppCompatActivity
     public boolean isFBLoggedIn() {
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
         return accessToken == null;
+    }
+
+    public boolean isTwitterLoggedIn() {
+        TwitterSession twitterSession = TwitterCore.getInstance().getSessionManager().getActiveSession();
+        return twitterSession != null;
+    }
+
+    public void loadFragment(Class fragmentClass){
+        try {
+            objFragment = (Fragment) fragmentClass.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        android.app.FragmentManager fragmentManager= getFragmentManager();
+        fragmentManager.beginTransaction().replace(R.id.frame, objFragment).commit();
     }
 }
