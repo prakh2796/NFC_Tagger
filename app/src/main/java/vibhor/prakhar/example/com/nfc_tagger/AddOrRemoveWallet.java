@@ -1,14 +1,17 @@
 package vibhor.prakhar.example.com.nfc_tagger;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +27,9 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private SettingsListAdapter settingsListdAdapter;
     private Button cancelButton,writeButton;
     private Intent intent;
+    private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private MyCardsAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,11 +40,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        listView = (ListView) findViewById(R.id.wallet_list);
-        settingsRowItemList = new ArrayList<SettingsRowItem>();
-        settingsListdAdapter = new SettingsListAdapter(this, settingsRowItemList);
-        listView.setAdapter(settingsListdAdapter);
-
+        recyclerView = (RecyclerView) findViewById(R.id.add_remove_card);
         cancelButton = (Button) findViewById(R.id.cancel_button);
         writeButton = (Button) findViewById(R.id.write_button);
 
@@ -50,12 +52,26 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             }
         });
 
-        for(int i = 1; i <= 5; i++){
-            SettingsRowItem settingsRowItem = new SettingsRowItem();
-            settingsRowItem.setSettings_menu("Setting " + i);
-            settingsRowItemList.add(settingsRowItem);
-        }
-        settingsListdAdapter.notifyDataSetChanged();
+        mAdapter = new MyCardsAdapter(myCardsArrayList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                MyCardsItem myCardsItem = myCardsArrayList.get(position);
+                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+
+            }
+        }));
+
+        prepareMovieData();
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
@@ -63,5 +79,21 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         startActivityForResult(myIntent, 0);
         return true;
 
+    }
+
+    private void prepareMovieData() {
+        MyCardsItem movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
+        myCardsArrayList.add(movie);
+
+        movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
+        myCardsArrayList.add(movie);
+
+        movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
+        myCardsArrayList.add(movie);
+
+        movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
+        myCardsArrayList.add(movie);
+
+        mAdapter.notifyDataSetChanged();
     }
 }

@@ -24,16 +24,16 @@ public class MyCards extends Fragment {
     private View view;
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private MycardsAdapter mAdapter;
+    private MyCardsAdapter mAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         view = inflater.inflate(R.layout.mycards, container, false);
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        recyclerView = (RecyclerView) view.findViewById(R.id.mycard);
 
-        mAdapter = new MycardsAdapter(myCardsArrayList);
+        mAdapter = new MyCardsAdapter(myCardsArrayList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());

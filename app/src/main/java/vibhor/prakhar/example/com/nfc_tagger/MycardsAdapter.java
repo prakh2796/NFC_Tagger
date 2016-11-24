@@ -12,7 +12,7 @@ import java.util.List;
  * Created by Prakhar Gupta on 23/11/2016.
  */
 
-public class MycardsAdapter extends RecyclerView.Adapter<MycardsAdapter.MyViewHolder> {
+public class MyCardsAdapter extends RecyclerView.Adapter<MyCardsAdapter.MyViewHolder> {
     private List<MyCardsItem> myCardsItemList;
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
@@ -25,7 +25,7 @@ public class MycardsAdapter extends RecyclerView.Adapter<MycardsAdapter.MyViewHo
         }
     }
 
-    public MycardsAdapter(List<MyCardsItem> myCardsItemList) {
+    public MyCardsAdapter(List<MyCardsItem> myCardsItemList) {
         this.myCardsItemList = myCardsItemList;
     }
 
