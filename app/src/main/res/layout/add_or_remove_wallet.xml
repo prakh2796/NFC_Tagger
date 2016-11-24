@@ -25,7 +25,7 @@
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="57dp">
 
 
@@ -35,7 +35,7 @@
                 android:layout_height="50dp"
                 android:padding="7dp"
                 android:textSize="20dp"
-                android:hint="NFC Tag Name"/>
+                android:hint="@string/nfc_tag_name"/>
 
             <LinearLayout
                 android:layout_marginTop="10dp"
@@ -50,7 +50,7 @@
                     android:layout_margin="5dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="CANCEL"
+                    android:text="@string/cancel"
                     android:layout_weight="1"/>
 
                 <Button
@@ -59,13 +59,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@color/colorPrimaryDark"
-                    android:text="WRITE"
+                    android:text="@string/write"
                     android:layout_weight="1"/>
 
             </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/add_remove_card"
+                android:id="@+id/add_remove_wallet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:scrollbars="vertical" />
@@ -73,7 +73,7 @@
         </LinearLayout>
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/add_wallet"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_anchor="@id/toolbar"

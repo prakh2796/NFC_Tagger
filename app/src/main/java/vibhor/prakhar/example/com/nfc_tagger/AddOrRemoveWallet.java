@@ -2,6 +2,7 @@ package vibhor.prakhar.example.com.nfc_tagger;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
@@ -22,14 +23,12 @@ import java.util.List;
 
 public class AddOrRemoveWallet extends AppCompatActivity {
 
-    private ListView listView;
-    private List<SettingsRowItem> settingsRowItemList;
-    private SettingsListAdapter settingsListdAdapter;
+    private FloatingActionButton floatingActionButtown;
     private Button cancelButton,writeButton;
     private Intent intent;
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
-    private MyCardsAdapter mAdapter;
+    private AddorRemoveAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +39,8 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        recyclerView = (RecyclerView) findViewById(R.id.add_remove_card);
+        recyclerView = (RecyclerView) findViewById(R.id.add_remove_wallet);
+        floatingActionButtown = (FloatingActionButton) findViewById(R.id.add_wallet);
         cancelButton = (Button) findViewById(R.id.cancel_button);
         writeButton = (Button) findViewById(R.id.write_button);
 
@@ -52,7 +52,14 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             }
         });
 
-        mAdapter = new MyCardsAdapter(myCardsArrayList);
+        floatingActionButtown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //call nfc
+            }
+        });
+
+        mAdapter = new AddorRemoveAdapter(myCardsArrayList);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -82,13 +89,13 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     }
 
     private void prepareMovieData() {
-        MyCardsItem movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
+        MyCardsItem movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure\nAction & Adventure\nAction & Adventure\n");
         myCardsArrayList.add(movie);
 
         movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
         myCardsArrayList.add(movie);
 
-        movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
+        movie = new MyCardsItem("Mad Max: Fury Road", "Action & AdventureAction & Adventure\nAction & Adventure\nAction & Adventure\n");
         myCardsArrayList.add(movie);
 
         movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");

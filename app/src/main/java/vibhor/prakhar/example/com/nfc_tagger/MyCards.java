@@ -58,13 +58,13 @@ public class MyCards extends Fragment {
     }
 
     private void prepareMovieData() {
-        MyCardsItem movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
+        MyCardsItem movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure\nAction & Adventure\nAction & Adventure\n");
         myCardsArrayList.add(movie);
 
         movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
         myCardsArrayList.add(movie);
 
-        movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
+        movie = new MyCardsItem("Mad Max: Fury Road", "Action & AdventureAction & Adventure\nAction & Adventure\nAction & Adventure\n");
         myCardsArrayList.add(movie);
 
         movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");

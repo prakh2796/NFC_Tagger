@@ -29,7 +29,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:paddingStart="10dp"
+                    android:paddingLeft="10dp"
                     android:paddingTop="5dp"
                     android:textSize="27dp"
                     android:textColor="#444444"
@@ -40,14 +40,6 @@
                     android:layout_height="match_parent"
                     android:layout_weight="9"/>
             </LinearLayout>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="7dp"
-                android:paddingLeft="10dp"
-                android:text="@string/wallets"
-                android:textSize="17dp"
-                android:textColor="@color/colorAccent"/>
             <View
                 android:layout_width="match_parent"
                 android:layout_height="2dp"
