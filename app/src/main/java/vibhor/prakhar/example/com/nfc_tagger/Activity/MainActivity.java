@@ -1,11 +1,10 @@
-package vibhor.prakhar.example.com.nfc_tagger;
+package vibhor.prakhar.example.com.nfc_tagger.Activity;
 
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -29,6 +28,11 @@ import com.facebook.login.LoginManager;
 import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterSession;
+
+import vibhor.prakhar.example.com.nfc_tagger.Service.CircleTransform;
+import vibhor.prakhar.example.com.nfc_tagger.Fragment.MyCards;
+import vibhor.prakhar.example.com.nfc_tagger.LoginActivity;
+import vibhor.prakhar.example.com.nfc_tagger.R;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

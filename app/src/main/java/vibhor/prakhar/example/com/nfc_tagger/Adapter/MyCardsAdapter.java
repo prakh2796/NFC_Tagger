@@ -1,4 +1,4 @@
-package vibhor.prakhar.example.com.nfc_tagger;
+package vibhor.prakhar.example.com.nfc_tagger.Adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -7,6 +7,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.List;
+
+import vibhor.prakhar.example.com.nfc_tagger.Model.MyCardsItem;
+import vibhor.prakhar.example.com.nfc_tagger.R;
 
 /**
  * Created by Prakhar Gupta on 23/11/2016.

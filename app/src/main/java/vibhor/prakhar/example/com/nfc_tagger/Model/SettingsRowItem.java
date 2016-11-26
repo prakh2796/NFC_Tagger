@@ -1,4 +1,4 @@
-package vibhor.prakhar.example.com.nfc_tagger;
+package vibhor.prakhar.example.com.nfc_tagger.Model;
 
 /**
  * Created by Prakhar Gupta on 03/11/2016.

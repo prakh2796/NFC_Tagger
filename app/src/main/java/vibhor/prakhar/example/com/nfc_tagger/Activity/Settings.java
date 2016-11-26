@@ -1,4 +1,4 @@
-package vibhor.prakhar.example.com.nfc_tagger;
+package vibhor.prakhar.example.com.nfc_tagger.Activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,11 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import vibhor.prakhar.example.com.nfc_tagger.Activity.MainActivity;
+import vibhor.prakhar.example.com.nfc_tagger.Adapter.SettingsListAdapter;
+import vibhor.prakhar.example.com.nfc_tagger.Model.SettingsRowItem;
+import vibhor.prakhar.example.com.nfc_tagger.R;
 
 /**
  * Created by Prakhar Gupta on 03/11/2016.

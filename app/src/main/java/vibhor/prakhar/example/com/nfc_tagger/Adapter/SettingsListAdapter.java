@@ -1,4 +1,4 @@
-package vibhor.prakhar.example.com.nfc_tagger;
+package vibhor.prakhar.example.com.nfc_tagger.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -8,6 +8,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.util.List;
+
+import vibhor.prakhar.example.com.nfc_tagger.R;
+import vibhor.prakhar.example.com.nfc_tagger.Model.SettingsRowItem;
 
 /**
  * Created by Prakhar Gupta on 03/11/2016.

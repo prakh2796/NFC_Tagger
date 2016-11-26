@@ -1,4 +1,4 @@
-package vibhor.prakhar.example.com.nfc_tagger;
+package vibhor.prakhar.example.com.nfc_tagger.Service;
 
 import android.content.Context;
 import android.graphics.Bitmap;
