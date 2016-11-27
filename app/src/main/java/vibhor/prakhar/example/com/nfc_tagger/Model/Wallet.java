@@ -5,6 +5,7 @@ package vibhor.prakhar.example.com.nfc_tagger.Model;
  */
 
 public class Wallet {
+    long id;
     String wallet_name;
     String wallet_key;
 
@@ -14,6 +15,14 @@ public class Wallet {
     public Wallet(String wallet_name, String wallet_key) {
         this.wallet_name = wallet_name;
         this.wallet_key = wallet_key;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getWallet_name() {

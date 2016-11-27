@@ -48,6 +48,8 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private long wallet_id;
     private WriteCardDialog writeCardDialog;
     private WriteWalletDialog writeWalletDialog;
+    public Button cancel,ok;
+    private EditText wallet_name,wallet_key;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 for(int i=0;i<myCardsArrayList.size();i++){
                     wallet = new Wallet(myCardsArrayList.get(i).getTitle(),myCardsArrayList.get(i).getContent());
                     wallet_id = db.createWallet(card_id, wallet);
+                    wallet.setId(wallet_id);
                 }
 
                 writeCardDialog = new WriteCardDialog(AddOrRemoveWallet.this);
@@ -94,9 +97,29 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         floatingActionButtown.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //call nfc
                 writeWalletDialog = new WriteWalletDialog(AddOrRemoveWallet.this, card_id);
                 writeWalletDialog.show();
+                cancel = (Button) writeWalletDialog.findViewById(R.id.cancel_button);
+                ok = (Button) writeWalletDialog.findViewById(R.id.ok_button);
+                wallet_name = (EditText) writeWalletDialog.findViewById(R.id.wallet_name);
+                wallet_key = (EditText) writeWalletDialog.findViewById(R.id.wallet_key);
+
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        writeWalletDialog.dismiss();
+                    }
+                });
+
+                ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        MyCardsItem movie = new MyCardsItem(wallet_name.getText().toString(), wallet_key.getText().toString());
+                        myCardsArrayList.add(movie);
+                        mAdapter.notifyDataSetChanged();
+                        writeWalletDialog.dismiss();
+                    }
+                });
             }
         });
 
@@ -119,7 +142,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             }
         }));
 
-        prepareWalletData();
+        mAdapter.notifyDataSetChanged();
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
@@ -127,18 +150,5 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         startActivityForResult(myIntent, 0);
         return true;
 
-    }
-
-    private void prepareWalletData() {
-        MyCardsItem movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure\nAction & Adventure\nAction & Adventure");
-        myCardsArrayList.add(movie);
-
-        movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
-        myCardsArrayList.add(movie);
-
-        movie = new MyCardsItem("Mad Max: Fury Road", "Action & AdventureAction & Adventure\nAction & Adventure\nAction & Adventure");
-        myCardsArrayList.add(movie);
-
-        mAdapter.notifyDataSetChanged();
     }
 }
