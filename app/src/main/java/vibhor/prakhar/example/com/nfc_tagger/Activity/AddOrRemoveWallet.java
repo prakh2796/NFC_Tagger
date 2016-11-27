@@ -25,6 +25,8 @@ import vibhor.prakhar.example.com.nfc_tagger.Model.Wallet;
 import vibhor.prakhar.example.com.nfc_tagger.R;
 import vibhor.prakhar.example.com.nfc_tagger.Service.DatabaseHelper;
 import vibhor.prakhar.example.com.nfc_tagger.Service.RecyclerTouchListener;
+import vibhor.prakhar.example.com.nfc_tagger.Service.WriteCardDialog;
+import vibhor.prakhar.example.com.nfc_tagger.Service.WriteWalletDialog;
 
 /**
  * Created by Prakhar Gupta on 12/11/2016.
@@ -44,6 +46,8 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private AddorRemoveAdapter mAdapter;
     private Wallet wallet;
     private long wallet_id;
+    private WriteCardDialog writeCardDialog;
+    private WriteWalletDialog writeWalletDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +85,9 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                     wallet = new Wallet(myCardsArrayList.get(i).getTitle(),myCardsArrayList.get(i).getContent());
                     wallet_id = db.createWallet(card_id, wallet);
                 }
+
+                writeCardDialog = new WriteCardDialog(AddOrRemoveWallet.this);
+                writeCardDialog.show();
             }
         });
 
@@ -88,6 +95,8 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //call nfc
+                writeWalletDialog = new WriteWalletDialog(AddOrRemoveWallet.this, card_id);
+                writeWalletDialog.show();
             }
         });
 
@@ -110,7 +119,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             }
         }));
 
-        prepareCardData();
+        prepareWalletData();
     }
 
     public boolean onOptionsItemSelected(MenuItem item){
@@ -120,7 +129,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
 
     }
 
-    private void prepareCardData() {
+    private void prepareWalletData() {
         MyCardsItem movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure\nAction & Adventure\nAction & Adventure");
         myCardsArrayList.add(movie);
 
@@ -128,9 +137,6 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         myCardsArrayList.add(movie);
 
         movie = new MyCardsItem("Mad Max: Fury Road", "Action & AdventureAction & Adventure\nAction & Adventure\nAction & Adventure");
-        myCardsArrayList.add(movie);
-
-        movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure");
         myCardsArrayList.add(movie);
 
         mAdapter.notifyDataSetChanged();

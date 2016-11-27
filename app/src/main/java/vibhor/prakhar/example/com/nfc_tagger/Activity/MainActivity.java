@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity
 //                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                        .setAction("Action", null).show();
                 intent = new Intent(MainActivity.this, AddOrRemoveWallet.class);
-                startActivity(intent);
+                startActivityForResult(intent, 0);
             }
         });
 
@@ -232,5 +232,14 @@ public class MainActivity extends AppCompatActivity
         }
         android.app.FragmentManager fragmentManager= getFragmentManager();
         fragmentManager.beginTransaction().replace(R.id.frame, objFragment).commit();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        fragmentClass = MyCards.class;
+        loadFragment(fragmentClass);
+
     }
 }
