@@ -190,6 +190,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return walletList;
     }
 
+    /**
+     * Deleting a wallet
+     */
+    public void deleteWallet(long wallet_id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_WALLET, KEY_ID + " = ?",
+                new String[] { String.valueOf(wallet_id) });
+    }
+
     // closing database
     public void closeDB() {
         SQLiteDatabase db = this.getReadableDatabase();

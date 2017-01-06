@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity
         loadNavHeader();
         navigationView.setNavigationItemSelectedListener(this);
 
-        Fragment objFragment=null;
+        objFragment=null;
         fragmentClass = MyCards.class;
         if (savedInstanceState == null) {
             fragmentClass = MyCards.class;

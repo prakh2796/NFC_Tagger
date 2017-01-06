@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    android:background="#E4E4EE"
     tools:context="vibhor.prakhar.example.com.nfc_tagger.Activity.AddOrRemoveWallet">
 
     <android.support.design.widget.AppBarLayout android:layout_width="match_parent"
@@ -68,7 +69,8 @@
                 android:id="@+id/add_remove_wallet"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="vertical" />
+                android:scrollbars="vertical"
+                android:layout_marginBottom="16dp"/>
 
         </LinearLayout>
 

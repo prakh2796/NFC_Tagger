@@ -1,6 +1,7 @@
 package vibhor.prakhar.example.com.nfc_tagger.Fragment;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -10,11 +11,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import vibhor.prakhar.example.com.nfc_tagger.Activity.AddOrRemoveWallet;
+import vibhor.prakhar.example.com.nfc_tagger.Activity.CardView;
+import vibhor.prakhar.example.com.nfc_tagger.Activity.MainActivity;
 import vibhor.prakhar.example.com.nfc_tagger.Adapter.MyCardsAdapter;
 import vibhor.prakhar.example.com.nfc_tagger.Interface.ClickListener;
 import vibhor.prakhar.example.com.nfc_tagger.Model.Card;
@@ -22,6 +28,7 @@ import vibhor.prakhar.example.com.nfc_tagger.Model.MyCardsItem;
 import vibhor.prakhar.example.com.nfc_tagger.Model.Wallet;
 import vibhor.prakhar.example.com.nfc_tagger.R;
 import vibhor.prakhar.example.com.nfc_tagger.Service.DatabaseHelper;
+import vibhor.prakhar.example.com.nfc_tagger.Service.ModifyCardDialog;
 import vibhor.prakhar.example.com.nfc_tagger.Service.RecyclerTouchListener;
 
 import static com.facebook.FacebookSdk.getApplicationContext;
@@ -36,7 +43,13 @@ public class MyCards extends Fragment {
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
     private MyCardsAdapter mAdapter;
-    private MyCardsItem movie;
+    private MyCardsItem myCardsItem;
+    private Intent intent;
+    private List<Card> cardList;
+    private List<Wallet> walletList;
+    private String content = "\0";
+    private ModifyCardDialog modifyCardDialog;
+    private TextView no,yes;
 
     @Nullable
     @Override
@@ -47,7 +60,7 @@ public class MyCards extends Fragment {
 
         recyclerView = (RecyclerView) view.findViewById(R.id.mycard);
 
-        mAdapter = new MyCardsAdapter(myCardsArrayList);
+        mAdapter = new MyCardsAdapter(myCardsArrayList, getActivity());
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -58,14 +71,40 @@ public class MyCards extends Fragment {
             public void onClick(View view, int position) {
                 MyCardsItem myCardsItem = myCardsArrayList.get(position);
                 Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                intent = new Intent(getActivity(), CardView.class);
+                intent.putExtra("name", cardList.get(position).getCardName());
+                intent.putExtra("id", cardList.get(position).getId());
+                startActivity(intent);
             }
 
             @Override
-            public void onLongClick(View view, int position) {
+            public void onLongClick(View view, final int position) {
+                final MyCardsItem myCardsItem = myCardsArrayList.get(position);
+                Toast.makeText(getApplicationContext(),cardList.get(position).getCardName(),Toast.LENGTH_SHORT).show();
+                modifyCardDialog = new ModifyCardDialog(getActivity());
+                modifyCardDialog.show();
+                no = (TextView) modifyCardDialog.findViewById(R.id.no_button);
+                yes = (TextView) modifyCardDialog.findViewById(R.id.yes_button);
 
+                no.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        modifyCardDialog.dismiss();
+                    }
+                });
+
+                yes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        modifyCardDialog.dismiss();
+                        db.deleteCard(cardList.get(position).getId());
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+                });
             }
         }));
-
         prepareCardData();
 
         return view;
@@ -73,7 +112,7 @@ public class MyCards extends Fragment {
 
     private void prepareCardData() {
 
-        String content = "\0";
+//        String content = "\0";
 
 //        MyCardsItem movie = new MyCardsItem("Mad Max: Fury Road", "Action & Adventure\nAction & Adventure\nAction & Adventure");
 //        myCardsArrayList.add(movie);
@@ -88,17 +127,17 @@ public class MyCards extends Fragment {
 //        wallet = new Wallet("Wallet 2","KEY 2");
 //        wallet_id = db.createWallet(card_id, wallet);
 
-        List<Card> cardList = db.getAllCards();
+        cardList = db.getAllCards();
         for(int i=0;i<cardList.size();i++){
             Log.e("cardId", String.valueOf(cardList.get(i).getId()));
             content = "\0";
-            List<Wallet> walletList = db.getWallets(cardList.get(i).getId());
+            walletList = db.getWallets(cardList.get(i).getId());
             for(int j=0;j<walletList.size();j++){
                 Log.e("cardId", walletList.get(j).getWallet_name());
                 content = content + walletList.get(j).getWallet_name() + "\n";
             }
-            movie = new MyCardsItem(cardList.get(i).getCardName(), content);
-            myCardsArrayList.add(movie);
+            myCardsItem = new MyCardsItem(cardList.get(i).getCardName(), content);
+            myCardsArrayList.add(myCardsItem);
         }
 
 //        movie = new MyCardsItem("Mad Max: Fury Road", "Paytm\nFreecharge");

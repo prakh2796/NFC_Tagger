@@ -8,6 +8,7 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
@@ -32,7 +33,7 @@ import vibhor.prakhar.example.com.nfc_tagger.Service.WriteWalletDialog;
  * Created by Prakhar Gupta on 12/11/2016.
  */
 
-public class AddOrRemoveWallet extends AppCompatActivity {
+public class CardView extends AppCompatActivity {
 
     private FloatingActionButton floatingActionButtown;
     private Button cancelButton,writeButton;
@@ -40,13 +41,12 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private long card_id;
     private Card card;
     private EditText tagName;
-    private Intent intent;
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
     private AddorRemoveAdapter mAdapter;
-    private Wallet wallet;
-    private long wallet_id;
-    private WriteCardDialog writeCardDialog;
+    private Intent intent;
+    private List<Wallet> walletList;
+    private MyCardsItem myCardsItem;
     private WriteWalletDialog writeWalletDialog;
     public Button cancel,ok;
     private EditText wallet_name,wallet_key;
@@ -59,6 +59,10 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         setSupportActionBar(toolbar);
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        intent = getIntent();
+
+        getSupportActionBar().setTitle(intent.getStringExtra("name"));
+        card_id = intent.getLongExtra("id", -1);
 
         db = new DatabaseHelper(getApplicationContext());
 
@@ -68,43 +72,42 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         writeButton = (Button) findViewById(R.id.write_button);
         tagName = (EditText) findViewById(R.id.tag_name);
 
-        cancelButton.setOnClickListener(new View.OnClickListener() {
+        tagName.setVisibility(View.GONE);
+        floatingActionButtown.setVisibility(View.GONE);
+        cancelButton.setVisibility(View.GONE);
+        writeButton.setVisibility(View.GONE);
+
+        mAdapter = new AddorRemoveAdapter(myCardsArrayList);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setAdapter(mAdapter);
+
+        walletList = db.getWallets(card_id);
+        for(int j=0;j<walletList.size();j++){
+            myCardsItem = new MyCardsItem(walletList.get(j).getWallet_name(), walletList.get(j).getWallet_key());
+            myCardsArrayList.add(myCardsItem);
+        }
+        mAdapter.notifyDataSetChanged();
+
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
             @Override
-            public void onClick(View view) {
-                myCardsArrayList = null;
-                intent = new Intent(AddOrRemoveWallet.this, MainActivity.class);
-                startActivity(intent);
+            public void onClick(View view, int position) {
+                MyCardsItem myCardsItem = myCardsArrayList.get(position);
+                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
             }
-        });
 
-        writeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                card = new Card(tagName.getText().toString());
-                card_id = db.createCard(card);
-                card.setId(card_id);
-
-                for(int i=0;i<myCardsArrayList.size();i++){
-                    wallet = new Wallet(myCardsArrayList.get(i).getTitle(),myCardsArrayList.get(i).getContent());
-                    wallet_id = db.createWallet(card_id, wallet);
-                    wallet.setId(wallet_id);
-                }
-
-                myCardsArrayList = null;
-                writeCardDialog = new WriteCardDialog(AddOrRemoveWallet.this);
-                writeCardDialog.show();
-            }
-        });
-
-        floatingActionButtown.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                writeWalletDialog = new WriteWalletDialog(AddOrRemoveWallet.this, card_id);
+            public void onLongClick(View view, int position) {
+                writeWalletDialog = new WriteWalletDialog(CardView.this, card_id);
                 writeWalletDialog.show();
                 cancel = (Button) writeWalletDialog.findViewById(R.id.cancel_button);
                 ok = (Button) writeWalletDialog.findViewById(R.id.ok_button);
                 wallet_name = (EditText) writeWalletDialog.findViewById(R.id.wallet_name);
                 wallet_key = (EditText) writeWalletDialog.findViewById(R.id.wallet_key);
+
+                wallet_name.setText(walletList.get(position).getWallet_name());
+                wallet_key.setText(walletList.get(position).getWallet_key());
 
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -116,31 +119,9 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        MyCardsItem myCardsItem = new MyCardsItem(wallet_name.getText().toString(), wallet_key.getText().toString());
-                        myCardsArrayList.add(myCardsItem);
-                        mAdapter.notifyDataSetChanged();
-                        writeWalletDialog.dismiss();
+
                     }
                 });
-            }
-        });
-
-        mAdapter = new AddorRemoveAdapter(myCardsArrayList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
-
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                MyCardsItem myCardsItem = myCardsArrayList.get(position);
-                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
             }
         }));
 

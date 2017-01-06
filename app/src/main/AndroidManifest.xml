@@ -49,6 +49,10 @@
             android:label="Add Or Remove Wallets"
             android:theme="@style/AppTheme.NoActionBar"/>
 
+        <activity
+            android:name=".Activity.CardView"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="cdba87fdd5fe317507b97feab27da70dc579f1b3" />

@@ -26,6 +26,6 @@
     <string name="cancel">CANCEL</string>
     <string name="write">WRITE</string>
     <string name="wallets">Wallets</string>
-    <string name="bitcoin_address"><u>Bitcoin Address</u></string>
-    <string name="label"><u>Label</u></string>
+    <string name="bitcoin_address">Bitcoin Address</string>
+    <string name="label">Label</string>
 </resources>
