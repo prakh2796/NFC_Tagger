@@ -144,9 +144,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
      */
     public void deleteCard(long card_id) {
         SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_WALLET, KEY_CARD_ID + " = ?",
+                new String[] { String.valueOf(card_id) });
         db.delete(TABLE_CARD, KEY_ID + " = ?",
                 new String[] { String.valueOf(card_id) });
     }
+
+    /**
+     * Updating a card
+     */
+    public void updateCard(long card_id, String cardName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_CARD_NAME, cardName);
+        db.update(TABLE_CARD, cv, KEY_ID+"="+card_id, null);
+    }
+
+
 
 
     /**
@@ -181,6 +195,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 Wallet wallet = new Wallet();
                 wallet.setWallet_name((c.getString(c.getColumnIndex(KEY_WALLET_NAME))));
                 wallet.setWallet_key((c.getString(c.getColumnIndex(KEY_WALLET_KEY))));
+                wallet.setId(Long.parseLong((c.getString(c.getColumnIndex(KEY_ID)))));
 
                 // adding to todo list
                 walletList.add(wallet);

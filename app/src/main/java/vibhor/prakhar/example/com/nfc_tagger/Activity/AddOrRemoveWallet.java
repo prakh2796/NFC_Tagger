@@ -8,10 +8,12 @@ import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -42,7 +44,9 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private EditText tagName;
     private Intent intent;
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
-    private RecyclerView recyclerView;
+    private List<Wallet> walletList = new ArrayList<>();
+//    private RecyclerView recyclerView;
+    private ListView listView;
     private AddorRemoveAdapter mAdapter;
     private Wallet wallet;
     private long wallet_id;
@@ -62,7 +66,8 @@ public class AddOrRemoveWallet extends AppCompatActivity {
 
         db = new DatabaseHelper(getApplicationContext());
 
-        recyclerView = (RecyclerView) findViewById(R.id.add_remove_wallet);
+//        recyclerView = (RecyclerView) findViewById(R.id.add_remove_wallet);
+        listView = (ListView) findViewById(R.id.add_remove_wallet);
         floatingActionButtown = (FloatingActionButton) findViewById(R.id.add_wallet);
         cancelButton = (Button) findViewById(R.id.cancel_button);
         writeButton = (Button) findViewById(R.id.write_button);
@@ -71,7 +76,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                myCardsArrayList = null;
+                myCardsArrayList = new ArrayList<>();
                 intent = new Intent(AddOrRemoveWallet.this, MainActivity.class);
                 startActivity(intent);
             }
@@ -87,10 +92,12 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 for(int i=0;i<myCardsArrayList.size();i++){
                     wallet = new Wallet(myCardsArrayList.get(i).getTitle(),myCardsArrayList.get(i).getContent());
                     wallet_id = db.createWallet(card_id, wallet);
+                    Log.e("check", String.valueOf(wallet_id));
                     wallet.setId(wallet_id);
+                    walletList.add(wallet);
                 }
 
-                myCardsArrayList = null;
+                myCardsArrayList = new ArrayList<>();
                 writeCardDialog = new WriteCardDialog(AddOrRemoveWallet.this);
                 writeCardDialog.show();
             }
@@ -125,12 +132,14 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             }
         });
 
-        mAdapter = new AddorRemoveAdapter(myCardsArrayList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+        mAdapter = new AddorRemoveAdapter(myCardsArrayList, getApplicationContext(), walletList);
+//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+//        recyclerView.setLayoutManager(mLayoutManager);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        recyclerView.setAdapter(mAdapter);
+        listView.setAdapter(mAdapter);
 
+        /*
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -142,7 +151,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             public void onLongClick(View view, int position) {
 
             }
-        }));
+        }));*/
 
         mAdapter.notifyDataSetChanged();
     }

@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,7 +43,8 @@ public class MyCards extends Fragment {
     private DatabaseHelper db;
     private View view;
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
-    private RecyclerView recyclerView;
+//    private RecyclerView recyclerView;
+    private ListView listView;
     private MyCardsAdapter mAdapter;
     private MyCardsItem myCardsItem;
     private Intent intent;
@@ -58,24 +61,63 @@ public class MyCards extends Fragment {
 
         db = new DatabaseHelper(getActivity());
 
-        recyclerView = (RecyclerView) view.findViewById(R.id.mycard);
+//        recyclerView = (RecyclerView) view.findViewById(R.id.mycard);
+        listView = (ListView) view.findViewById(R.id.mycard);
+        prepareCardData();
+        mAdapter = new MyCardsAdapter(myCardsArrayList, getActivity(), cardList);
+        mAdapter.notifyDataSetChanged();
+//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+//        recyclerView.setLayoutManager(mLayoutManager);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        recyclerView.setAdapter(mAdapter);
+        listView.setAdapter(mAdapter);
 
-        mAdapter = new MyCardsAdapter(myCardsArrayList, getActivity());
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                MyCardsItem myCardsItem = myCardsArrayList.get(i);
+//                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                intent = new Intent(getActivity(), CardView.class);
+                intent.putExtra("name", cardList.get(i).getCardName());
+                intent.putExtra("id", cardList.get(i).getId());
+                startActivity(intent);
+                getActivity().finish();
+//                Log.d("hell", String.valueOf(view.getId()));
+//                Log.d("hell", String.valueOf(R.id.context_dots));
+            }
+        });
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
+                db.updateCard(cardList.get(i).getId(), "ALF");
+                Intent intent = new Intent(getActivity(), MainActivity.class);
+                startActivity(intent);
+                getActivity().finish();
+                return true;
+            }
+        });
+
+        /*
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
                 MyCardsItem myCardsItem = myCardsArrayList.get(position);
-                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
                 intent = new Intent(getActivity(), CardView.class);
                 intent.putExtra("name", cardList.get(position).getCardName());
                 intent.putExtra("id", cardList.get(position).getId());
-                startActivity(intent);
+//                Log.d("hell", String.valueOf(view.getId()));
+//                Log.d("hell", String.valueOf(R.id.context_dots));
+//                if(view.getId() == R.id.context_dots){
+//                    Log.d("hell", "");
+//                } else {
+                if(view.getId() != R.id.context_dots) {
+                    startActivity(intent);
+                }
+//                }
             }
+
 
             @Override
             public void onLongClick(View view, final int position) {
@@ -104,8 +146,8 @@ public class MyCards extends Fragment {
                     }
                 });
             }
-        }));
-        prepareCardData();
+        }));*/
+//        prepareCardData();
 
         return view;
     }
@@ -129,11 +171,11 @@ public class MyCards extends Fragment {
 
         cardList = db.getAllCards();
         for(int i=0;i<cardList.size();i++){
-            Log.e("cardId", String.valueOf(cardList.get(i).getId()));
+//            Log.e("cardId", String.valueOf(cardList.get(i).getId()));
             content = "\0";
             walletList = db.getWallets(cardList.get(i).getId());
             for(int j=0;j<walletList.size();j++){
-                Log.e("cardId", walletList.get(j).getWallet_name());
+//                Log.e("cardId", walletList.get(j).getWallet_name() + walletList.get(j).getWallet_key());
                 content = content + walletList.get(j).getWallet_name() + "\n";
             }
             myCardsItem = new MyCardsItem(cardList.get(i).getCardName(), content);
@@ -143,6 +185,6 @@ public class MyCards extends Fragment {
 //        movie = new MyCardsItem("Mad Max: Fury Road", "Paytm\nFreecharge");
 //        myCardsArrayList.add(movie);
 
-        mAdapter.notifyDataSetChanged();
+//        mAdapter.notifyDataSetChanged();
     }
 }

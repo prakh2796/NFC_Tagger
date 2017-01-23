@@ -11,8 +11,10 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ public class CardView extends AppCompatActivity {
     private EditText tagName;
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
     private RecyclerView recyclerView;
+    private ListView listView;
     private AddorRemoveAdapter mAdapter;
     private Intent intent;
     private List<Wallet> walletList;
@@ -66,7 +69,8 @@ public class CardView extends AppCompatActivity {
 
         db = new DatabaseHelper(getApplicationContext());
 
-        recyclerView = (RecyclerView) findViewById(R.id.add_remove_wallet);
+//        recyclerView = (RecyclerView) findViewById(R.id.add_remove_wallet);
+        listView = (ListView) findViewById(R.id.add_remove_wallet);
         floatingActionButtown = (FloatingActionButton) findViewById(R.id.add_wallet);
         cancelButton = (Button) findViewById(R.id.cancel_button);
         writeButton = (Button) findViewById(R.id.write_button);
@@ -77,19 +81,31 @@ public class CardView extends AppCompatActivity {
         cancelButton.setVisibility(View.GONE);
         writeButton.setVisibility(View.GONE);
 
-        mAdapter = new AddorRemoveAdapter(myCardsArrayList);
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-        recyclerView.setLayoutManager(mLayoutManager);
-        recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerView.setAdapter(mAdapter);
+//        mAdapter = new AddorRemoveAdapter(myCardsArrayList, getApplicationContext(), walletList);
+//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+//        recyclerView.setLayoutManager(mLayoutManager);
+//        recyclerView.setItemAnimator(new DefaultItemAnimator());
+//        recyclerView.setAdapter(mAdapter);
+//        listView.setAdapter(mAdapter);
 
         walletList = db.getWallets(card_id);
         for(int j=0;j<walletList.size();j++){
+            Log.e("lololo", String.valueOf(walletList.get(j).getId()) + String.valueOf(walletList.get(j).getWallet_name()));
             myCardsItem = new MyCardsItem(walletList.get(j).getWallet_name(), walletList.get(j).getWallet_key());
             myCardsArrayList.add(myCardsItem);
         }
+        mAdapter = new AddorRemoveAdapter(myCardsArrayList, CardView.this, walletList, intent.getStringExtra("name"), card_id);
         mAdapter.notifyDataSetChanged();
+        listView.setAdapter(mAdapter);
 
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Log.d("hell", String.valueOf(view.getId()));
+            }
+        });
+
+        /*
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
             @Override
             public void onClick(View view, int position) {
@@ -123,9 +139,18 @@ public class CardView extends AppCompatActivity {
                     }
                 });
             }
-        }));
+        }));*/
 
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        // code here to show dialog
+        super.onBackPressed();  // optional depending on your needs
+        intent = new Intent(CardView.this, MainActivity.class);
+        startActivity(intent);
     }
 
     public boolean onOptionsItemSelected(MenuItem item){

@@ -11,6 +11,7 @@
         android:paddingTop="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_vertical_margin"
+        android:paddingBottom="12dp"
         android:orientation="horizontal">
         
         <LinearLayout
@@ -36,9 +37,12 @@
                     android:textStyle="bold"
                     android:text="John Doe"/>
                 <ImageView
+                    android:id="@+id/context_dots"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="9"/>
+                    android:layout_weight="9"
+                    android:padding="8dp"
+                    android:src="@drawable/close_cross"/>
             </LinearLayout>
             <View
                 android:layout_width="match_parent"
