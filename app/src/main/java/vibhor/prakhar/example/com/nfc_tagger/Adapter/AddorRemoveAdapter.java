@@ -39,11 +39,13 @@ public class AddorRemoveAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private Context context;
     private List<Wallet> walletList;
+    private String displayText;
+
     private String cardName;
-    private Long card_id;
+    private Long card_id = Long.valueOf(0);
 
     private ModifyCardDialog modifyCardDialog;
-    private TextView no,yes;
+    private TextView no,yes,textView;
     private DatabaseHelper db;
 
     public AddorRemoveAdapter(List<MyCardsItem> myCardsItemList, Context context, List<Wallet> walletList) {
@@ -52,12 +54,13 @@ public class AddorRemoveAdapter extends BaseAdapter {
         this.walletList = walletList;
     }
 
-    public AddorRemoveAdapter(List<MyCardsItem> myCardsItemList, Context context, List<Wallet> walletList, String cardName, Long card_id) {
+    public AddorRemoveAdapter(List<MyCardsItem> myCardsItemList, Context context, List<Wallet> walletList, String cardName, Long card_id, String displayText) {
         this.myCardsItemList = myCardsItemList;
         this.context = context;
         this.walletList = walletList;
         this.cardName = cardName;
         this.card_id = card_id;
+        this.displayText = displayText;
     }
 
     @Override
@@ -86,47 +89,50 @@ public class AddorRemoveAdapter extends BaseAdapter {
         holder.title = (TextView) view.findViewById(R.id.title);
         holder.content = (TextView) view.findViewById(R.id.content);
         holder.context_dots = (ImageView) view.findViewById(R.id.context_dots);
-        if(walletList == null){
-            holder.context_dots.setVisibility(View.GONE);
-        }
         view.setTag(holder);
 
         MyCardsItem myCardsItem = myCardsItemList.get(i);
         holder.title.setText(myCardsItem.getTitle());
         holder.content.setText(myCardsItem.getContent());
 
-        holder.context_dots.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                db = new DatabaseHelper(getApplicationContext());
-                Log.e("abcxyzprakhar","abcxyzprakhar");
-                Toast.makeText(context,"db done",Toast.LENGTH_SHORT).show();
-                modifyCardDialog = new ModifyCardDialog(context);
-                modifyCardDialog.show();
-                no = (TextView) modifyCardDialog.findViewById(R.id.no_button);
-                yes = (TextView) modifyCardDialog.findViewById(R.id.yes_button);
+        if(card_id == 0){
+            holder.context_dots.setVisibility(View.GONE);
+        } else {
+            holder.context_dots.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    db = new DatabaseHelper(getApplicationContext());
+                    Log.e("abcxyzprakhar", "abcxyzprakhar");
+                    Toast.makeText(context, "db done", Toast.LENGTH_SHORT).show();
+                    modifyCardDialog = new ModifyCardDialog(context);
+                    modifyCardDialog.show();
+                    no = (TextView) modifyCardDialog.findViewById(R.id.no_button);
+                    yes = (TextView) modifyCardDialog.findViewById(R.id.yes_button);
+                    textView = (TextView) modifyCardDialog.findViewById(R.id.textView);
+                    textView.setText(displayText);
 
-                no.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        modifyCardDialog.dismiss();
-                    }
-                });
+                    no.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            modifyCardDialog.dismiss();
+                        }
+                    });
 
-                yes.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        modifyCardDialog.dismiss();
-                        db.deleteWallet(walletList.get(i).getId());
-                        Intent intent = new Intent(context, CardView.class);
-                        intent.putExtra("name", cardName);
-                        intent.putExtra("id", card_id);
-                        context.startActivity(intent);
-                        ((Activity)context).finish();
-                    }
-                });
-            }
-        });
+                    yes.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            modifyCardDialog.dismiss();
+                            db.deleteWallet(walletList.get(i).getId());
+                            Intent intent = new Intent(context, CardView.class);
+                            intent.putExtra("name", cardName);
+                            intent.putExtra("id", card_id);
+                            context.startActivity(intent);
+                            ((Activity) context).finish();
+                        }
+                    });
+                }
+            });
+        }
 
         return view;
     }
@@ -136,40 +142,4 @@ public class AddorRemoveAdapter extends BaseAdapter {
         public TextView title, content;
         public ImageView context_dots;
     }
-
-    /*
-    public class MyViewHolder extends RecyclerView.ViewHolder {
-        public TextView title, content;
-
-        public MyViewHolder(View view) {
-            super(view);
-            title = (TextView) view.findViewById(R.id.title);
-            content = (TextView) view.findViewById(R.id.content);
-        }
-    }
-
-    public AddorRemoveAdapter(List<MyCardsItem> myCardsItemList) {
-        this.myCardsItemList = myCardsItemList;
-    }
-
-    @Override
-    public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.add_or_remove_wallet_item, parent, false);
-
-        return new MyViewHolder(itemView);
-    }
-
-    @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
-        MyCardsItem myCardsItem = myCardsItemList.get(position);
-        holder.title.setText(myCardsItem.getTitle());
-        holder.content.setText(myCardsItem.getContent());
-    }
-
-    @Override
-    public int getItemCount() {
-        return myCardsItemList.size();
-    }
-    */
 }

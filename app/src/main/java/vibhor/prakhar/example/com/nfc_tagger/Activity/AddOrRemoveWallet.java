@@ -45,7 +45,6 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private Intent intent;
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
     private List<Wallet> walletList = new ArrayList<>();
-//    private RecyclerView recyclerView;
     private ListView listView;
     private AddorRemoveAdapter mAdapter;
     private Wallet wallet;
@@ -54,6 +53,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private WriteWalletDialog writeWalletDialog;
     public Button cancel,ok;
     private EditText wallet_name,wallet_key;
+    private String displayText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,8 +65,8 @@ public class AddOrRemoveWallet extends AppCompatActivity {
 //        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         db = new DatabaseHelper(getApplicationContext());
+        displayText = "Are you sure you want to delete this Card ?";
 
-//        recyclerView = (RecyclerView) findViewById(R.id.add_remove_wallet);
         listView = (ListView) findViewById(R.id.add_remove_wallet);
         floatingActionButtown = (FloatingActionButton) findViewById(R.id.add_wallet);
         cancelButton = (Button) findViewById(R.id.cancel_button);
@@ -125,6 +125,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                     public void onClick(View view) {
                         MyCardsItem myCardsItem = new MyCardsItem(wallet_name.getText().toString(), wallet_key.getText().toString());
                         myCardsArrayList.add(myCardsItem);
+                        Log.e("bolbol", myCardsItem.getContent());
                         mAdapter.notifyDataSetChanged();
                         writeWalletDialog.dismiss();
                     }
@@ -133,26 +134,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         });
 
         mAdapter = new AddorRemoveAdapter(myCardsArrayList, getApplicationContext(), walletList);
-//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-//        recyclerView.setLayoutManager(mLayoutManager);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        recyclerView.setAdapter(mAdapter);
         listView.setAdapter(mAdapter);
-
-        /*
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                MyCardsItem myCardsItem = myCardsArrayList.get(position);
-                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
-
-            }
-        }));*/
-
         mAdapter.notifyDataSetChanged();
     }
 

@@ -8,14 +8,14 @@ import android.view.Window;
 import vibhor.prakhar.example.com.nfc_tagger.R;
 
 /**
- * Created by Prakhar Gupta on 01/01/2017.
+ * Created by Prakhar Gupta on 25/01/2017.
  */
 
-public class ModifyCardDialog extends Dialog {
+public class EditCardDialog extends Dialog {
 
-    public Context context;
+    private Context context;
 
-    public ModifyCardDialog(Context context) {
+    public EditCardDialog(Context context) {
         super(context);
         this.context = context;
     }
@@ -24,6 +24,6 @@ public class ModifyCardDialog extends Dialog {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.delete_dialog);
+        setContentView(R.layout.edit_card_dialog);
     }
 }

@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -30,6 +32,7 @@ import vibhor.prakhar.example.com.nfc_tagger.Model.MyCardsItem;
 import vibhor.prakhar.example.com.nfc_tagger.Model.Wallet;
 import vibhor.prakhar.example.com.nfc_tagger.R;
 import vibhor.prakhar.example.com.nfc_tagger.Service.DatabaseHelper;
+import vibhor.prakhar.example.com.nfc_tagger.Service.EditCardDialog;
 import vibhor.prakhar.example.com.nfc_tagger.Service.ModifyCardDialog;
 import vibhor.prakhar.example.com.nfc_tagger.Service.RecyclerTouchListener;
 
@@ -52,7 +55,10 @@ public class MyCards extends Fragment {
     private List<Wallet> walletList;
     private String content = "\0";
     private ModifyCardDialog modifyCardDialog;
-    private TextView no,yes;
+    private TextView no,yes,cardName;
+    private String displayText;
+    private Button edit,cancel;
+    private EditCardDialog editCardDialog;
 
     @Nullable
     @Override
@@ -64,91 +70,53 @@ public class MyCards extends Fragment {
 //        recyclerView = (RecyclerView) view.findViewById(R.id.mycard);
         listView = (ListView) view.findViewById(R.id.mycard);
         prepareCardData();
-        mAdapter = new MyCardsAdapter(myCardsArrayList, getActivity(), cardList);
+        displayText = "Are you sure you want to delete this Card ?";
+        mAdapter = new MyCardsAdapter(myCardsArrayList, getActivity(), cardList, displayText);
         mAdapter.notifyDataSetChanged();
-//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-//        recyclerView.setLayoutManager(mLayoutManager);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        recyclerView.setAdapter(mAdapter);
         listView.setAdapter(mAdapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 MyCardsItem myCardsItem = myCardsArrayList.get(i);
-//                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
                 intent = new Intent(getActivity(), CardView.class);
                 intent.putExtra("name", cardList.get(i).getCardName());
                 intent.putExtra("id", cardList.get(i).getId());
                 startActivity(intent);
                 getActivity().finish();
-//                Log.d("hell", String.valueOf(view.getId()));
-//                Log.d("hell", String.valueOf(R.id.context_dots));
             }
         });
 
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                db.updateCard(cardList.get(i).getId(), "ALF");
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                startActivity(intent);
-                getActivity().finish();
-                return true;
-            }
-        });
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
+                editCardDialog = new EditCardDialog(getActivity());
+                editCardDialog.show();
+                cancel = (Button) editCardDialog.findViewById(R.id.cancel_button);
+                edit = (Button) editCardDialog.findViewById(R.id.edit_button);
+                cardName = (EditText) editCardDialog.findViewById(R.id.cardName);
+                cardName.setText(cardList.get(i).getCardName());
 
-        /*
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                MyCardsItem myCardsItem = myCardsArrayList.get(position);
-//                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-                intent = new Intent(getActivity(), CardView.class);
-                intent.putExtra("name", cardList.get(position).getCardName());
-                intent.putExtra("id", cardList.get(position).getId());
-//                Log.d("hell", String.valueOf(view.getId()));
-//                Log.d("hell", String.valueOf(R.id.context_dots));
-//                if(view.getId() == R.id.context_dots){
-//                    Log.d("hell", "");
-//                } else {
-                if(view.getId() != R.id.context_dots) {
-                    startActivity(intent);
-                }
-//                }
-            }
-
-
-            @Override
-            public void onLongClick(View view, final int position) {
-                final MyCardsItem myCardsItem = myCardsArrayList.get(position);
-                Toast.makeText(getApplicationContext(),cardList.get(position).getCardName(),Toast.LENGTH_SHORT).show();
-                modifyCardDialog = new ModifyCardDialog(getActivity());
-                modifyCardDialog.show();
-                no = (TextView) modifyCardDialog.findViewById(R.id.no_button);
-                yes = (TextView) modifyCardDialog.findViewById(R.id.yes_button);
-
-                no.setOnClickListener(new View.OnClickListener() {
+                cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        modifyCardDialog.dismiss();
+                        editCardDialog.dismiss();
                     }
                 });
 
-                yes.setOnClickListener(new View.OnClickListener() {
+                edit.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        modifyCardDialog.dismiss();
-                        db.deleteCard(cardList.get(position).getId());
+                        db.updateCard(cardList.get(i).getId(), cardName.getText().toString());
                         Intent intent = new Intent(getActivity(), MainActivity.class);
+                        editCardDialog.dismiss();
                         startActivity(intent);
                         getActivity().finish();
                     }
                 });
+                return true;
             }
-        }));*/
-//        prepareCardData();
-
+        });
         return view;
     }
 
@@ -171,11 +139,9 @@ public class MyCards extends Fragment {
 
         cardList = db.getAllCards();
         for(int i=0;i<cardList.size();i++){
-//            Log.e("cardId", String.valueOf(cardList.get(i).getId()));
             content = "\0";
             walletList = db.getWallets(cardList.get(i).getId());
             for(int j=0;j<walletList.size();j++){
-//                Log.e("cardId", walletList.get(j).getWallet_name() + walletList.get(j).getWallet_key());
                 content = content + walletList.get(j).getWallet_name() + "\n";
             }
             myCardsItem = new MyCardsItem(cardList.get(i).getCardName(), content);

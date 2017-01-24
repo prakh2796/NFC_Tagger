@@ -44,14 +44,15 @@ public class CardView extends AppCompatActivity {
     private Card card;
     private EditText tagName;
     private List<MyCardsItem> myCardsArrayList = new ArrayList<>();
-    private RecyclerView recyclerView;
     private ListView listView;
     private AddorRemoveAdapter mAdapter;
     private Intent intent;
     private List<Wallet> walletList;
     private MyCardsItem myCardsItem;
+    private String displayText;
     private WriteWalletDialog writeWalletDialog;
     public Button cancel,ok;
+    private String cardName;
     private EditText wallet_name,wallet_key;
 
     @Override
@@ -63,13 +64,13 @@ public class CardView extends AppCompatActivity {
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 //        getSupportActionBar().setDisplayShowHomeEnabled(true);
         intent = getIntent();
-
-        getSupportActionBar().setTitle(intent.getStringExtra("name"));
+        cardName = intent.getStringExtra("name");
+        getSupportActionBar().setTitle(cardName);
         card_id = intent.getLongExtra("id", -1);
 
         db = new DatabaseHelper(getApplicationContext());
+        displayText = "Are you sure you want to delete this Wallet ?";
 
-//        recyclerView = (RecyclerView) findViewById(R.id.add_remove_wallet);
         listView = (ListView) findViewById(R.id.add_remove_wallet);
         floatingActionButtown = (FloatingActionButton) findViewById(R.id.add_wallet);
         cancelButton = (Button) findViewById(R.id.cancel_button);
@@ -81,49 +82,27 @@ public class CardView extends AppCompatActivity {
         cancelButton.setVisibility(View.GONE);
         writeButton.setVisibility(View.GONE);
 
-//        mAdapter = new AddorRemoveAdapter(myCardsArrayList, getApplicationContext(), walletList);
-//        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
-//        recyclerView.setLayoutManager(mLayoutManager);
-//        recyclerView.setItemAnimator(new DefaultItemAnimator());
-//        recyclerView.setAdapter(mAdapter);
-//        listView.setAdapter(mAdapter);
-
         walletList = db.getWallets(card_id);
         for(int j=0;j<walletList.size();j++){
             Log.e("lololo", String.valueOf(walletList.get(j).getId()) + String.valueOf(walletList.get(j).getWallet_name()));
             myCardsItem = new MyCardsItem(walletList.get(j).getWallet_name(), walletList.get(j).getWallet_key());
             myCardsArrayList.add(myCardsItem);
         }
-        mAdapter = new AddorRemoveAdapter(myCardsArrayList, CardView.this, walletList, intent.getStringExtra("name"), card_id);
+        mAdapter = new AddorRemoveAdapter(myCardsArrayList, CardView.this, walletList, cardName, card_id, displayText);
         mAdapter.notifyDataSetChanged();
         listView.setAdapter(mAdapter);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Log.d("hell", String.valueOf(view.getId()));
-            }
-        });
-
-        /*
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new ClickListener() {
-            @Override
-            public void onClick(View view, int position) {
-                MyCardsItem myCardsItem = myCardsArrayList.get(position);
-                Toast.makeText(getApplicationContext(), myCardsItem.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onLongClick(View view, int position) {
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, final int i, long l) {
                 writeWalletDialog = new WriteWalletDialog(CardView.this, card_id);
                 writeWalletDialog.show();
                 cancel = (Button) writeWalletDialog.findViewById(R.id.cancel_button);
                 ok = (Button) writeWalletDialog.findViewById(R.id.ok_button);
                 wallet_name = (EditText) writeWalletDialog.findViewById(R.id.wallet_name);
                 wallet_key = (EditText) writeWalletDialog.findViewById(R.id.wallet_key);
-
-                wallet_name.setText(walletList.get(position).getWallet_name());
-                wallet_key.setText(walletList.get(position).getWallet_key());
+                wallet_name.setText(walletList.get(i).getWallet_name());
+                wallet_key.setText(walletList.get(i).getWallet_key());
 
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -135,11 +114,18 @@ public class CardView extends AppCompatActivity {
                 ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-
+                        db.updateWallet(walletList.get(i).getId(), wallet_name.getText().toString(), wallet_key.getText().toString());
+                        Intent intent = new Intent(CardView.this, CardView.class);
+                        intent.putExtra("name", cardName);
+                        intent.putExtra("id", card_id);
+                        writeWalletDialog.dismiss();
+                        startActivity(intent);
+                        finish();
                     }
                 });
+                return true;
             }
-        }));*/
+        });
 
         mAdapter.notifyDataSetChanged();
     }

@@ -214,6 +214,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[] { String.valueOf(wallet_id) });
     }
 
+    /**
+     * Updating a wallet
+     */
+    public void updateWallet(long wallet_id, String walletName, String walletKey) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_WALLET_NAME, walletName);
+        cv.put(KEY_WALLET_KEY, walletKey);
+        db.update(TABLE_WALLET, cv, KEY_ID+"="+wallet_id, null);
+    }
+
     // closing database
     public void closeDB() {
         SQLiteDatabase db = this.getReadableDatabase();
