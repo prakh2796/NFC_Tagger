@@ -21,7 +21,8 @@
     <string name="action_settings">Settings</string>
     <string name="action_logout">Logout</string>
 
-    <string name="facebook_app_id">212968779127867</string>
+    <string name="facebook_app_id1">212968779127867</string>
+    <string name="facebook_app_id2">2200093090129474</string>
     <string name="nfc_tag_name">NFC Tag Name</string>
     <string name="cancel">CANCEL</string>
     <string name="write">WRITE</string>
