@@ -54,6 +54,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     public Button cancel,ok;
     private EditText wallet_name,wallet_key;
     private String displayText;
+    private MyCardsItem myCardsItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +124,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        MyCardsItem myCardsItem = new MyCardsItem(wallet_name.getText().toString(), wallet_key.getText().toString());
+                        myCardsItem = new MyCardsItem(wallet_name.getText().toString(), wallet_key.getText().toString());
                         myCardsArrayList.add(myCardsItem);
                         Log.e("bolbol", myCardsItem.getContent());
                         mAdapter.notifyDataSetChanged();

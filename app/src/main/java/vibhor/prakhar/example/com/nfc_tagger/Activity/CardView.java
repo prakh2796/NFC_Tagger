@@ -48,6 +48,8 @@ public class CardView extends AppCompatActivity {
     private AddorRemoveAdapter mAdapter;
     private Intent intent;
     private List<Wallet> walletList;
+    private Wallet wallet;
+    private long wallet_id;
     private MyCardsItem myCardsItem;
     private String displayText;
     private WriteWalletDialog writeWalletDialog;
@@ -78,7 +80,7 @@ public class CardView extends AppCompatActivity {
         tagName = (EditText) findViewById(R.id.tag_name);
 
         tagName.setVisibility(View.GONE);
-        floatingActionButtown.setVisibility(View.GONE);
+//        floatingActionButtown.setVisibility(View.GONE);
         cancelButton.setVisibility(View.GONE);
         writeButton.setVisibility(View.GONE);
 
@@ -124,6 +126,42 @@ public class CardView extends AppCompatActivity {
                     }
                 });
                 return true;
+            }
+        });
+
+        floatingActionButtown.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                writeWalletDialog = new WriteWalletDialog(CardView.this, card_id);
+            writeWalletDialog.show();
+                cancel = (Button) writeWalletDialog.findViewById(R.id.cancel_button);
+                ok = (Button) writeWalletDialog.findViewById(R.id.ok_button);
+                wallet_name = (EditText) writeWalletDialog.findViewById(R.id.wallet_name);
+                wallet_key = (EditText) writeWalletDialog.findViewById(R.id.wallet_key);
+
+                cancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        writeWalletDialog.dismiss();
+                    }
+                });
+
+                ok.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        wallet = new Wallet(wallet_name.getText().toString(),wallet_key.getText().toString());
+                        wallet_id = db.createWallet(card_id, wallet);
+                        Log.e("check", String.valueOf(wallet_id));
+                        wallet.setId(wallet_id);
+
+                        Intent intent = new Intent(CardView.this, CardView.class);
+                        intent.putExtra("name", cardName);
+                        intent.putExtra("id", card_id);
+                        writeWalletDialog.dismiss();
+                        startActivity(intent);
+                        finish();
+                    }
+                });
             }
         });
 
