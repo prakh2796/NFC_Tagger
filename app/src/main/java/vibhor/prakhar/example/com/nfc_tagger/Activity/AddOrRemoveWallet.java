@@ -77,9 +77,10 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                myCardsArrayList = new ArrayList<>();
-                intent = new Intent(AddOrRemoveWallet.this, MainActivity.class);
-                startActivity(intent);
+//                myCardsArrayList = new ArrayList<>();
+//                intent = new Intent(AddOrRemoveWallet.this, MainActivity.class);
+//                startActivity(intent);
+                finish();
             }
         });
 

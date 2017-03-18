@@ -3,6 +3,7 @@ package vibhor.prakhar.example.com.nfc_tagger.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
@@ -52,6 +53,8 @@ public class MainActivity extends AppCompatActivity
     private Fragment objFragment;
     private Class fragmentClass;
 
+    private NfcAdapter nfcAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,6 +98,13 @@ public class MainActivity extends AppCompatActivity
             loadFragment(fragmentClass);
         }
 
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (nfcAdapter != null && nfcAdapter.isEnabled()) {
+            Toast.makeText(this,"NFC Available!",Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(this,"NFC Not Available!",Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void loadNavHeader() {
