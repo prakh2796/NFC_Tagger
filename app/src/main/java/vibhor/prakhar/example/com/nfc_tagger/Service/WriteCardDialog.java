@@ -21,7 +21,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by Prakhar Gupta on 27/11/2016.
  */
 
-public class WriteCardDialog extends Dialog implements View.OnClickListener {
+public class WriteCardDialog extends Dialog {
 
     public Context context;
     public Activity activity;
@@ -38,16 +38,16 @@ public class WriteCardDialog extends Dialog implements View.OnClickListener {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.write_card_dialog);
-        writeLater = (Button) findViewById(R.id.write_later);
-        writeLater.setOnClickListener(this);
+//        writeLater = (Button) findViewById(R.id.write_later);
+//        writeLater.setOnClickListener(this);
 
     }
 
-    @Override
-    public void onClick(View view) {
-        Intent intent = new Intent();
-        activity.setResult(RESULT_OK,intent);
-        activity.finish();
-        dismiss();
-    }
+//    @Override
+//    public void onClick(View view) {
+//        Intent intent = new Intent();
+//        activity.setResult(RESULT_OK,intent);
+//        activity.finish();
+//        dismiss();
+//    }
 }

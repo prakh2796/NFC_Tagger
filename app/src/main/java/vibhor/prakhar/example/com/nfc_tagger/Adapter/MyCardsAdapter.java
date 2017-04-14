@@ -91,7 +91,7 @@ public class MyCardsAdapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 db = new DatabaseHelper(getApplicationContext());
-                Toast.makeText(context,myCardsItem.getTitle(),Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context,myCardsItem.getTitle(),Toast.LENGTH_SHORT).show();
                 modifyCardDialog = new ModifyCardDialog(context);
                 modifyCardDialog.show();
                 no = (TextView) modifyCardDialog.findViewById(R.id.no_button);

@@ -1,6 +1,14 @@
 package vibhor.prakhar.example.com.nfc_tagger.Activity;
 
+import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
+import android.nfc.tech.Ndef;
+import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -16,8 +24,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import vibhor.prakhar.example.com.nfc_tagger.Adapter.AddorRemoveAdapter;
 import vibhor.prakhar.example.com.nfc_tagger.Interface.ClickListener;
@@ -51,10 +61,11 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private long wallet_id;
     private WriteCardDialog writeCardDialog;
     private WriteWalletDialog writeWalletDialog;
-    public Button cancel,ok;
+    public Button cancel,ok, write_later;
     private EditText wallet_name,wallet_key;
     private String displayText;
     private MyCardsItem myCardsItem;
+    private NfcAdapter nfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,13 +77,17 @@ public class AddOrRemoveWallet extends AppCompatActivity {
 //        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         db = new DatabaseHelper(getApplicationContext());
-        displayText = "Are you sure you want to delete this Card ?";
+        displayText = "Are you sure you want to delete this Card?";
 
         listView = (ListView) findViewById(R.id.add_remove_wallet);
         floatingActionButtown = (FloatingActionButton) findViewById(R.id.add_wallet);
         cancelButton = (Button) findViewById(R.id.cancel_button);
         writeButton = (Button) findViewById(R.id.write_button);
         tagName = (EditText) findViewById(R.id.tag_name);
+
+
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -87,21 +102,39 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         writeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                card = new Card(tagName.getText().toString());
-                card_id = db.createCard(card);
-                card.setId(card_id);
 
-                for(int i=0;i<myCardsArrayList.size();i++){
-                    wallet = new Wallet(myCardsArrayList.get(i).getTitle(),myCardsArrayList.get(i).getContent());
-                    wallet_id = db.createWallet(card_id, wallet);
-                    Log.e("check", String.valueOf(wallet_id));
-                    wallet.setId(wallet_id);
-                    walletList.add(wallet);
+                if (tagName.getText() != null) {
+                    card = new Card(tagName.getText().toString());
+                    card_id = db.createCard(card);
+                    card.setId(card_id);
+
+                    for (int i = 0; i < myCardsArrayList.size(); i++) {
+                        wallet = new Wallet(myCardsArrayList.get(i).getTitle(), myCardsArrayList.get(i).getContent());
+                        wallet_id = db.createWallet(card_id, wallet);
+                        Log.e("check", String.valueOf(wallet_id));
+                        wallet.setId(wallet_id);
+                        walletList.add(wallet);
+                    }
+
+                    myCardsArrayList = new ArrayList<>();
+                    writeCardDialog = new WriteCardDialog(AddOrRemoveWallet.this);
+                    writeCardDialog.show();
+                    enableForegroundDispath();
+
+                    write_later = (Button) writeCardDialog.findViewById(R.id.write_later);
+                    write_later.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+
+//                            disableForegroundDispath();
+//                            writeCardDialog.dismiss();
+//                            finish();
+                            closeActivity();
+                        }
+                    });
+                }else {
+                    Toast.makeText(getApplicationContext(), "Card Name cannot be EMPTY!",Toast.LENGTH_LONG).show();
                 }
-
-                myCardsArrayList = new ArrayList<>();
-                writeCardDialog = new WriteCardDialog(AddOrRemoveWallet.this);
-                writeCardDialog.show();
             }
         });
 
@@ -140,10 +173,144 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         mAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+
+        if (intent.hasExtra(NfcAdapter.EXTRA_TAG)){
+            Toast.makeText(this,"NFC Intent",Toast.LENGTH_SHORT).show();
+
+            Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+//            NdefMessage ndefMessage = createNdefMessage("my message test");
+//            NdefMessage ndefMessage = createNdefMessage(tagName.getText().toString());
+
+            NdefMessage ndefMessage = createNdefMessage(tagName.getText().toString());
+
+            writeNdefMessage(tag,ndefMessage);
+            //closeActivity();
+        }
+    }
+
     public boolean onOptionsItemSelected(MenuItem item){
         Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
         startActivityForResult(myIntent, 0);
         return true;
 
+    }
+
+    private void enableForegroundDispath(){
+
+        Log.e("NFC","foreground enable");
+        intent = new Intent(this,AddOrRemoveWallet.class).addFlags(Intent.FLAG_RECEIVER_REPLACE_PENDING);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        IntentFilter[] intentFilters = new IntentFilter[]{};
+        nfcAdapter.enableForegroundDispatch(this, pendingIntent, intentFilters, null);
+
+    }
+
+    private void disableForegroundDispath(){
+
+        Log.e("NFC","foreground disable");
+        nfcAdapter.disableForegroundDispatch(this);
+
+    }
+
+    private void formatTag(Tag tag, NdefMessage ndefMessage){
+
+        try {
+
+            NdefFormatable ndefFormatable = NdefFormatable.get(tag);
+
+            if (ndefFormatable == null){
+                Toast.makeText(this,"Tag is not NdefFormatable!",Toast.LENGTH_SHORT).show();
+            }
+
+            ndefFormatable.connect();
+            ndefFormatable.format(ndefMessage);
+            ndefFormatable.close();
+            Toast.makeText(this,"Message Written1",Toast.LENGTH_SHORT).show();
+            disableForegroundDispath();
+            writeCardDialog.dismiss();
+            finish();
+
+        }catch (Exception e){
+            Log.e("formatTag", e.getMessage());
+        }
+
+    }
+
+    private void writeNdefMessage(Tag tag, NdefMessage ndefMessage){
+
+        try {
+
+            if (tag == null){
+                Toast.makeText(this,"Tag object cannot be null",Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            Ndef ndef = Ndef.get(tag);
+
+            if (ndef == null){
+                //format tag with the ndef format and writes the message
+                formatTag(tag, ndefMessage);
+            }else {
+                ndef.connect();
+
+                if (!ndef.isWritable()){
+                    Toast.makeText(this,"Tag is not writable!",Toast.LENGTH_SHORT).show();
+                    ndef.close();
+                    return;
+                }
+
+                ndef.writeNdefMessage(ndefMessage);
+                ndef.close();
+                Toast.makeText(this,"Message Written2",Toast.LENGTH_SHORT).show();
+                closeActivity();
+            }
+
+        }catch (Exception e){
+            Log.e("writeNdefMessage", e.getMessage());
+        }
+
+    }
+
+    private NdefRecord createTextRecord(String content) {
+        try {
+            // Get UTF-8 byte
+            byte[] lang = Locale.getDefault().getLanguage().getBytes("UTF-8");
+            byte[] text = content.getBytes("UTF-8"); // Content in UTF-8
+
+            int langSize = lang.length;
+            int textLength = text.length;
+
+            ByteArrayOutputStream payload = new ByteArrayOutputStream(1 + langSize + textLength);
+            payload.write((byte) (langSize & 0x1F));
+            payload.write(lang, 0, langSize);
+            payload.write(text, 0, textLength);
+
+            NdefRecord record = new NdefRecord(NdefRecord.TNF_WELL_KNOWN, NdefRecord.RTD_TEXT, new byte[0], payload.toByteArray());
+            return record;
+        }
+        catch (Exception e) {
+            Log.e("createTextRecord", e.getMessage());
+        }
+
+        return null;
+    }
+
+    private NdefMessage createNdefMessage(String content){
+
+        NdefRecord ndefRecord = createTextRecord(content);
+        //NdefRecord[] ndefRecordsArray = new NdefRecord[]{};
+//        ndefRecordsArray[0] = ndefRecord;
+//        NdefMessage ndefMessage = new NdefMessage(ndefRecordsArray);
+        NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{ndefRecord});
+        return ndefMessage;
+    }
+
+    private void closeActivity(){
+        disableForegroundDispath();
+        writeCardDialog.dismiss();
+        finish();
     }
 }
