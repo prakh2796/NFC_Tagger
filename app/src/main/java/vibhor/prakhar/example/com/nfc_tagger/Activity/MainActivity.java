@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity
     private Fragment objFragment;
     private Class fragmentClass;
 
-    private NfcAdapter nfcAdapter;
+//    private NfcAdapter nfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,12 +99,12 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (nfcAdapter != null && nfcAdapter.isEnabled()) {
-            Toast.makeText(this,"NFC Available!",Toast.LENGTH_SHORT).show();
-        }else {
-            Toast.makeText(this,"NFC Not Available!",Toast.LENGTH_SHORT).show();
-        }
+//        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+//        if (nfcAdapter != null && nfcAdapter.isEnabled()) {
+//            Toast.makeText(this,"NFC Available!",Toast.LENGTH_SHORT).show();
+//        }else {
+//            Toast.makeText(this,"NFC Not Available!",Toast.LENGTH_SHORT).show();
+//        }
     }
 
     private void loadNavHeader() {

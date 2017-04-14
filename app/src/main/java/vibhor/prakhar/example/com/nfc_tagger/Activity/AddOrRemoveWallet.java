@@ -3,6 +3,7 @@ package vibhor.prakhar.example.com.nfc_tagger.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
@@ -10,6 +11,7 @@ import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
 import android.os.Bundle;
+import android.os.Debug;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -87,7 +89,11 @@ public class AddOrRemoveWallet extends AppCompatActivity {
 
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-
+        if (nfcAdapter != null && nfcAdapter.isEnabled()) {
+            Toast.makeText(this,"NFC Available!",Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(this,"NFC Not Available!",Toast.LENGTH_SHORT).show();
+        }
 
         cancelButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -300,11 +306,21 @@ public class AddOrRemoveWallet extends AppCompatActivity {
 
     private NdefMessage createNdefMessage(String content){
 
-        NdefRecord ndefRecord = createTextRecord(content);
-        //NdefRecord[] ndefRecordsArray = new NdefRecord[]{};
-//        ndefRecordsArray[0] = ndefRecord;
-//        NdefMessage ndefMessage = new NdefMessage(ndefRecordsArray);
-        NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{ndefRecord});
+        NdefRecord ndefRecord1 = createTextRecord(content);
+        NdefRecord ndefRecord2;
+        List<NdefRecord> ndefList = new ArrayList<NdefRecord>();
+        ndefList.add(ndefRecord1);
+        for (int i = 0; i < walletList.size(); i++){
+            Uri uri = Uri.parse(walletList.get(i).getWallet_key().toString());
+            ndefRecord1 = createTextRecord(walletList.get(i).getWallet_name().toString());
+            ndefRecord2 = NdefRecord.createUri(uri);
+            ndefList.add(ndefRecord1);
+            ndefList.add(ndefRecord2);
+        }
+        NdefRecord[] ndefRecordsArray = ndefList.toArray(new NdefRecord[ndefList.size()]);
+//        Log.e("ndefArray",ndefRecordsArray.length + "");
+        NdefMessage ndefMessage = new NdefMessage(ndefRecordsArray);
+//        NdefMessage ndefMessage = new NdefMessage(new NdefRecord[]{ndefRecord});
         return ndefMessage;
     }
 
