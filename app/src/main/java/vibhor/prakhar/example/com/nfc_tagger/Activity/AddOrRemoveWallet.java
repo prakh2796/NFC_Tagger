@@ -49,7 +49,7 @@ import vibhor.prakhar.example.com.nfc_tagger.Service.WriteWalletDialog;
 public class AddOrRemoveWallet extends AppCompatActivity {
 
     private FloatingActionButton floatingActionButtown;
-    private Button cancelButton,writeButton;
+    private Button cancelButton,writeButton,writeCardButton;
     private DatabaseHelper db;
     private long card_id;
     private Card card;
@@ -85,8 +85,9 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         floatingActionButtown = (FloatingActionButton) findViewById(R.id.add_wallet);
         cancelButton = (Button) findViewById(R.id.cancel_button);
         writeButton = (Button) findViewById(R.id.write_button);
+        writeCardButton = (Button) findViewById(R.id.write_button2);
         tagName = (EditText) findViewById(R.id.tag_name);
-
+        writeCardButton.setVisibility(View.GONE);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         if (nfcAdapter != null && nfcAdapter.isEnabled()) {
@@ -201,7 +202,6 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         Intent myIntent = new Intent(getApplicationContext(), MainActivity.class);
         startActivityForResult(myIntent, 0);
         return true;
-
     }
 
     private void enableForegroundDispath(){

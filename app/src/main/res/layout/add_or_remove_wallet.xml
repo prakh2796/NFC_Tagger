@@ -81,6 +81,15 @@
 
         </LinearLayout>
 
+    <Button
+        android:id="@+id/write_button2"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark"
+        android:text="WRITE CARD"
+        android:layout_gravity="bottom"/>
+
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_wallet"
         android:layout_width="wrap_content"
