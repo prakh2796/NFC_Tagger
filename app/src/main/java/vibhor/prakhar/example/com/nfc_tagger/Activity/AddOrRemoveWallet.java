@@ -109,7 +109,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if (tagName.getText() != null) {
+                if (tagName.getText().toString().trim().length() != 0) {
                     card = new Card(tagName.getText().toString());
                     card_id = db.createCard(card);
                     card.setId(card_id);
@@ -218,6 +218,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
 
         Log.e("NFC","foreground disable");
         nfcAdapter.disableForegroundDispatch(this);
+        Log.e("NFC", "check1");
 
     }
 
@@ -235,9 +236,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
             ndefFormatable.format(ndefMessage);
             ndefFormatable.close();
             Toast.makeText(this,"Message Written1",Toast.LENGTH_SHORT).show();
-            disableForegroundDispath();
-            writeCardDialog.dismiss();
-            finish();
+            closeActivity();
 
         }catch (Exception e){
             Log.e("formatTag", e.getMessage());
@@ -271,12 +270,13 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 ndef.writeNdefMessage(ndefMessage);
                 ndef.close();
                 Toast.makeText(this,"Message Written2",Toast.LENGTH_SHORT).show();
-                closeActivity();
             }
 
         }catch (Exception e){
             Log.e("writeNdefMessage", e.getMessage());
         }
+
+        closeActivity();
 
     }
 
@@ -325,8 +325,10 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     }
 
     private void closeActivity(){
+        Log.e("NFC", "Closing Activity...");
         disableForegroundDispath();
         writeCardDialog.dismiss();
+        Log.e("NFC", "check2");
         finish();
     }
 }
