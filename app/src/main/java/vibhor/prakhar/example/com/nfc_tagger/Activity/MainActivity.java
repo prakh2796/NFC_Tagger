@@ -249,9 +249,14 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        super.onActivityResult(requestCode, resultCode, data);
+//        super.onActivityResult(requestCode, resultCode, data);
         fragmentClass = MyCards.class;
         loadFragment(fragmentClass);
+        if (requestCode == 0){
+            if (resultCode == 2){
+                this.finish();
+            }
+        }
 
     }
 }

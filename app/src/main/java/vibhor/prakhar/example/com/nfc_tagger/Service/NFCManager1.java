@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import vibhor.prakhar.example.com.nfc_tagger.Activity.MainActivity;
 import vibhor.prakhar.example.com.nfc_tagger.Model.Wallet;
 
 /**
@@ -83,7 +84,7 @@ public class NFCManager1 {
             Log.e("NFC","Message Written1");
             disableForegroundDispath();
 //            writeCardDialog.dismiss();
-            activity.finish();
+            closeActivity();
 
         }catch (Exception e){
             Log.e("formatTag", e.getMessage());
@@ -120,12 +121,15 @@ public class NFCManager1 {
                 ndef.close();
                 Toast.makeText(activity,"Message Written2",Toast.LENGTH_SHORT).show();
                 Log.e("NFC","Message Written2");
+                disableForegroundDispath();
 //                closeActivity();
             }
 
         }catch (Exception e){
             Log.e("writeNdefMessage", e.getMessage());
         }
+
+        closeActivity();
 
     }
 
@@ -162,18 +166,20 @@ public class NFCManager1 {
 
         if(walletList.size()!=0) {
             for (int i = 0; i < walletList.size(); i++) {
+                ndefRecord1 = createTextRecord(walletList.get(i).getWallet_name().toString());
 
                 String url = walletList.get(i).getWallet_key().toString();
-                if(url==""){
-                    url="NA";
+                if (url.trim().length() == 0){
+                    url = "bitcoin:";
                 }
                 Uri uri = Uri.parse(url);
-                ndefRecord1 = createTextRecord(walletList.get(i).getWallet_name().toString());
                 ndefRecord2 = NdefRecord.createUri(uri);
+
                 ndefList.add(ndefRecord1);
                 ndefList.add(ndefRecord2);
             }
         }
+
         NdefRecord[] ndefRecordsArray = ndefList.toArray(new NdefRecord[ndefList.size()]);
 //        Log.e("ndefArray",ndefRecordsArray.length + "");
         NdefMessage ndefMessage = new NdefMessage(ndefRecordsArray);
@@ -182,8 +188,11 @@ public class NFCManager1 {
     }
 
     public void closeActivity(){
-        disableForegroundDispath();
+        Log.e("NFC", "Closing Activity...");
+//        disableForegroundDispath();
 //        writeCardDialog.dismiss();
-        activity.finish();
+        Log.e("NFC", "check2");
+        intent = new Intent(activity, MainActivity.class);
+        activity.startActivity(intent);
     }
 }

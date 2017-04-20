@@ -353,13 +353,22 @@ public class CardView extends AppCompatActivity {
         NdefRecord ndefRecord2;
         List<NdefRecord> ndefList = new ArrayList<NdefRecord>();
         ndefList.add(ndefRecord1);
-        for (int i = 0; i < walletList.size(); i++){
-            Uri uri = Uri.parse(walletList.get(i).getWallet_key().toString());
-            ndefRecord1 = createTextRecord(walletList.get(i).getWallet_name().toString());
-            ndefRecord2 = NdefRecord.createUri(uri);
-            ndefList.add(ndefRecord1);
-            ndefList.add(ndefRecord2);
+        if(walletList.size()!=0) {
+            for (int i = 0; i < walletList.size(); i++) {
+                ndefRecord1 = createTextRecord(walletList.get(i).getWallet_name().toString());
+
+                String url = walletList.get(i).getWallet_key().toString();
+                if (url.trim().length() == 0){
+                    url = "bitcoin:";
+                }
+                Uri uri = Uri.parse(url);
+                ndefRecord2 = NdefRecord.createUri(uri);
+
+                ndefList.add(ndefRecord1);
+                ndefList.add(ndefRecord2);
+            }
         }
+
         NdefRecord[] ndefRecordsArray = ndefList.toArray(new NdefRecord[ndefList.size()]);
 //        Log.e("ndefArray",ndefRecordsArray.length + "");
         NdefMessage ndefMessage = new NdefMessage(ndefRecordsArray);
@@ -374,5 +383,6 @@ public class CardView extends AppCompatActivity {
         Log.e("NFC", "check2");
         intent = new Intent(CardView.this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 }
