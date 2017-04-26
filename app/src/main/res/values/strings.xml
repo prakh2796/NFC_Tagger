@@ -29,4 +29,9 @@
     <string name="wallets">Wallets</string>
     <string name="bitcoin_address">Bitcoin Address</string>
     <string name="label">Label</string>
+
+    <string-array name="wallet_type">
+        <item>Bitcoin Address</item>
+        <item>Blockchain Link</item>
+    </string-array>
 </resources>

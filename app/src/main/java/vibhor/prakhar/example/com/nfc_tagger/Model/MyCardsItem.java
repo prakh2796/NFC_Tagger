@@ -5,12 +5,18 @@ package vibhor.prakhar.example.com.nfc_tagger.Model;
  */
 
 public class MyCardsItem {
-    private String title,content;
+    private String type,title,content;
 
     public MyCardsItem() {
     }
 
     public MyCardsItem(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+
+    public MyCardsItem(String type, String title, String content) {
+        this.type = type;
         this.title = title;
         this.content = content;
     }
@@ -30,4 +36,8 @@ public class MyCardsItem {
     public void setContent(String content) {
         this.content = content;
     }
+
+    public String getType() { return type; }
+
+    public void setType(String type) { this.type = type; }
 }

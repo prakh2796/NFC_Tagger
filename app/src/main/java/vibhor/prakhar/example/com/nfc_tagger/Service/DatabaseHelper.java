@@ -41,6 +41,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String KEY_CARD_ID = "card_id";
     // WALLET Table - column names
+    private static final String KEY_WALLET_TYPE = "wallet_type";
     private static final String KEY_WALLET_NAME = "wallet_name";
     private static final String KEY_WALLET_KEY = "wallet_key";
 
@@ -53,7 +54,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Wallet table create statement
     private static final String CREATE_TABLE_WALLET = "CREATE TABLE "
             + TABLE_WALLET + "(" + KEY_ID + " INTEGER PRIMARY KEY,"
-            + KEY_CARD_ID + " INTEGER," + KEY_WALLET_NAME+ " TEXT," + KEY_WALLET_KEY+ " TEXT" + ")";
+            + KEY_CARD_ID + " INTEGER," + KEY_WALLET_TYPE + " TEXT," + KEY_WALLET_NAME+ " TEXT," + KEY_WALLET_KEY+ " TEXT" + ")";
 
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -171,6 +172,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_CARD_ID, card_id);
+        values.put(KEY_WALLET_TYPE, wallet.getWallet_type());
         values.put(KEY_WALLET_NAME, wallet.getWallet_name());
         values.put(KEY_WALLET_KEY, wallet.getWallet_key());
 
@@ -193,6 +195,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         if (c.moveToFirst()) {
             do {
                 Wallet wallet = new Wallet();
+                wallet.setWallet_type((c.getString(c.getColumnIndex(KEY_WALLET_TYPE))));
                 wallet.setWallet_name((c.getString(c.getColumnIndex(KEY_WALLET_NAME))));
                 wallet.setWallet_key((c.getString(c.getColumnIndex(KEY_WALLET_KEY))));
                 wallet.setId(Long.parseLong((c.getString(c.getColumnIndex(KEY_ID)))));
@@ -217,9 +220,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Updating a wallet
      */
-    public void updateWallet(long wallet_id, String walletName, String walletKey) {
+    public void updateWallet(long wallet_id, String walletType, String walletName, String walletKey) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
+        cv.put(KEY_WALLET_TYPE, walletType);
         cv.put(KEY_WALLET_NAME, walletName);
         cv.put(KEY_WALLET_KEY, walletKey);
         db.update(TABLE_WALLET, cv, KEY_ID+"="+wallet_id, null);

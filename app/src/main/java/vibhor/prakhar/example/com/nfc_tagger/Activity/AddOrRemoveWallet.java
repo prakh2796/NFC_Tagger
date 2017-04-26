@@ -21,9 +21,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
@@ -65,7 +68,8 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private WriteWalletDialog writeWalletDialog;
     public Button cancel,ok, write_later;
     private EditText wallet_name,wallet_key;
-    private String displayText;
+    private Spinner spinner;
+    private String displayText, wallet_type = "bitcoin";
     private MyCardsItem myCardsItem;
     private NfcAdapter nfcAdapter;
 
@@ -90,8 +94,12 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         writeCardButton.setVisibility(View.GONE);
 
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        if (nfcAdapter != null && nfcAdapter.isEnabled()) {
-            Toast.makeText(this,"NFC Available!",Toast.LENGTH_SHORT).show();
+        if (nfcAdapter != null) {
+            if(nfcAdapter.isEnabled()) {
+                Toast.makeText(this, "NFC Available!", Toast.LENGTH_SHORT).show();
+            }else {
+                Toast.makeText(this, "NFC is off!", Toast.LENGTH_SHORT).show();
+            }
         }else {
             Toast.makeText(this,"NFC Not Available!",Toast.LENGTH_SHORT).show();
         }
@@ -116,7 +124,10 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                     card.setId(card_id);
 
                     for (int i = 0; i < myCardsArrayList.size(); i++) {
-                        wallet = new Wallet(myCardsArrayList.get(i).getTitle(), myCardsArrayList.get(i).getContent());
+                        wallet = new Wallet(
+                                myCardsArrayList.get(i).getType(),
+                                myCardsArrayList.get(i).getTitle(),
+                                myCardsArrayList.get(i).getContent());
                         wallet_id = db.createWallet(card_id, wallet);
                         Log.e("check", String.valueOf(wallet_id));
                         wallet.setId(wallet_id);
@@ -126,7 +137,17 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                     myCardsArrayList = new ArrayList<>();
                     writeCardDialog = new WriteCardDialog(AddOrRemoveWallet.this);
                     writeCardDialog.show();
-                    enableForegroundDispath();
+                    if (nfcAdapter != null) {
+                        if(nfcAdapter.isEnabled()) {
+                            enableForegroundDispath();
+                        }else {
+                            Toast.makeText(AddOrRemoveWallet.this, "Turn on NFC!", Toast.LENGTH_SHORT).show();
+                            enableForegroundDispath();
+                        }
+                    }else {
+                        Toast.makeText(AddOrRemoveWallet.this,"NFC Not Available!",Toast.LENGTH_SHORT).show();
+                    }
+
 
                     write_later = (Button) writeCardDialog.findViewById(R.id.write_later);
                     write_later.setOnClickListener(new View.OnClickListener() {
@@ -155,6 +176,24 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 wallet_name = (EditText) writeWalletDialog.findViewById(R.id.wallet_name);
                 wallet_key = (EditText) writeWalletDialog.findViewById(R.id.wallet_key);
 
+                spinner = (Spinner) writeWalletDialog.findViewById(R.id.spinner1);
+                ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(AddOrRemoveWallet.this,
+                        R.array.wallet_type, android.R.layout.simple_spinner_item);
+                arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                spinner.setAdapter(arrayAdapter);
+
+                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                        Toast.makeText(AddOrRemoveWallet.this, "Position: " + i, Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> adapterView) {
+                        Toast.makeText(AddOrRemoveWallet.this, "Position: ", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -165,7 +204,15 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 ok.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        myCardsItem = new MyCardsItem(wallet_name.getText().toString(), wallet_key.getText().toString());
+                        if (spinner.getSelectedItemPosition() == 0){
+                            wallet_type = "bitcoin";
+                        }else if(spinner.getSelectedItemPosition() == 1){
+                            wallet_type = "blockchain";
+                        }else {
+                            Toast.makeText(AddOrRemoveWallet.this, "Check Position: " + spinner.getSelectedItemPosition(),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        myCardsItem = new MyCardsItem(wallet_type, wallet_name.getText().toString(), wallet_key.getText().toString());
                         myCardsArrayList.add(myCardsItem);
                         Log.e("bolbol", myCardsItem.getContent());
                         mAdapter.notifyDataSetChanged();
@@ -317,8 +364,19 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 ndefRecord1 = createTextRecord(walletList.get(i).getWallet_name().toString());
 
                 String url = walletList.get(i).getWallet_key().toString();
-                if (url.trim().length() == 0){
-                    url = "bitcoin:";
+                String type = walletList.get(i).getWallet_type().toString();
+                Log.e("Type",type);
+                if (type.matches("bitcoin")){
+//                    Log.e("URL",url);
+                    url = "bitcoin:" + url;
+//                    Log.e("URL",url);
+                }else if(type.matches("blockchain")){
+//                    Log.e("URL",url);
+                    url = "http://blockchain.info/address/" + url;
+//                    Log.e("URL",url);
+                }else {
+                    url = "*something went wrong*";
+                    Log.e("URL",url);
                 }
                 Uri uri = Uri.parse(url);
                 ndefRecord2 = NdefRecord.createUri(uri);
