@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="vibhor.prakhar.example.com.nfc_tagger.LoginActivity">
+    tools:context="vibhor.prakhar.example.com.nfc_tagger.Activity.LoginActivity">
 
     <!-- Login progress -->
     <ProgressBar

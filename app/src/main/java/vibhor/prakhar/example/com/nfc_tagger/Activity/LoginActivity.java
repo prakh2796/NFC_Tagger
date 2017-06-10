@@ -1,4 +1,4 @@
-package vibhor.prakhar.example.com.nfc_tagger;
+package vibhor.prakhar.example.com.nfc_tagger.Activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -52,7 +52,7 @@ import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
 
 import io.fabric.sdk.android.Fabric;
-import vibhor.prakhar.example.com.nfc_tagger.Activity.MainActivity;
+import vibhor.prakhar.example.com.nfc_tagger.R;
 
 import org.json.JSONException;
 import org.json.JSONObject;

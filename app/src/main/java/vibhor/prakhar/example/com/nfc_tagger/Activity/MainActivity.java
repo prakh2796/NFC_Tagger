@@ -3,7 +3,6 @@ package vibhor.prakhar.example.com.nfc_tagger.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.nfc.NfcAdapter;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
@@ -33,7 +32,6 @@ import com.twitter.sdk.android.core.TwitterSession;
 
 import vibhor.prakhar.example.com.nfc_tagger.Service.CircleTransform;
 import vibhor.prakhar.example.com.nfc_tagger.Fragment.MyCards;
-import vibhor.prakhar.example.com.nfc_tagger.LoginActivity;
 import vibhor.prakhar.example.com.nfc_tagger.R;
 
 public class MainActivity extends AppCompatActivity
