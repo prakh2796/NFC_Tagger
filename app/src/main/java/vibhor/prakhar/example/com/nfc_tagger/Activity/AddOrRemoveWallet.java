@@ -3,6 +3,7 @@ package vibhor.prakhar.example.com.nfc_tagger.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -10,13 +11,12 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Debug;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -25,9 +25,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -35,13 +39,11 @@ import java.util.List;
 import java.util.Locale;
 
 import vibhor.prakhar.example.com.nfc_tagger.Adapter.AddorRemoveAdapter;
-import vibhor.prakhar.example.com.nfc_tagger.Interface.ClickListener;
 import vibhor.prakhar.example.com.nfc_tagger.Model.Card;
 import vibhor.prakhar.example.com.nfc_tagger.Model.MyCardsItem;
 import vibhor.prakhar.example.com.nfc_tagger.Model.Wallet;
 import vibhor.prakhar.example.com.nfc_tagger.R;
 import vibhor.prakhar.example.com.nfc_tagger.Service.DatabaseHelper;
-import vibhor.prakhar.example.com.nfc_tagger.Service.RecyclerTouchListener;
 import vibhor.prakhar.example.com.nfc_tagger.Service.WriteCardDialog;
 import vibhor.prakhar.example.com.nfc_tagger.Service.WriteWalletDialog;
 
@@ -67,11 +69,15 @@ public class AddOrRemoveWallet extends AppCompatActivity {
     private WriteCardDialog writeCardDialog;
     private WriteWalletDialog writeWalletDialog;
     public Button cancel,ok, write_later;
+    private ImageButton scanQRbtn;
     private EditText wallet_name,wallet_key;
     private Spinner spinner;
     private String displayText, wallet_type = "bitcoin";
     private MyCardsItem myCardsItem;
     private NfcAdapter nfcAdapter;
+    private IntentIntegrator qrScan;
+    int requestCode = 200;
+    String[] permission = {"android.permission.CAMERA"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +181,7 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 ok = (Button) writeWalletDialog.findViewById(R.id.ok_button);
                 wallet_name = (EditText) writeWalletDialog.findViewById(R.id.wallet_name);
                 wallet_key = (EditText) writeWalletDialog.findViewById(R.id.wallet_key);
+                scanQRbtn = (ImageButton) writeWalletDialog.findViewById(R.id.scanBtn);
 
                 spinner = (Spinner) writeWalletDialog.findViewById(R.id.spinner1);
                 ArrayAdapter<CharSequence> arrayAdapter = ArrayAdapter.createFromResource(AddOrRemoveWallet.this,
@@ -185,15 +192,36 @@ public class AddOrRemoveWallet extends AppCompatActivity {
                 spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                        Toast.makeText(AddOrRemoveWallet.this, "Position: " + i, Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(AddOrRemoveWallet.this, "Position: " + i, Toast.LENGTH_SHORT).show();
+                        if (i==0){
+                            scanQRbtn.setEnabled(true);
+                            scanQRbtn.setImageResource(R.drawable.camera_50);
+                        }else if(i==1){
+                            scanQRbtn.setEnabled(false);
+                            scanQRbtn.setImageResource(R.drawable.no_camera_50);
+                        }
                     }
 
                     @Override
                     public void onNothingSelected(AdapterView<?> adapterView) {
-                        Toast.makeText(AddOrRemoveWallet.this, "Position: ", Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(AddOrRemoveWallet.this, "Position: ", Toast.LENGTH_SHORT).show();
                     }
                 });
 
+                scanQRbtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                            if (checkCallingOrSelfPermission(permission[0]) == PackageManager.PERMISSION_GRANTED) {
+                                scanQRCode();
+                            } else {
+                                ActivityCompat.requestPermissions(AddOrRemoveWallet.this, permission, requestCode);
+                            }
+                        }else {
+                            scanQRCode();
+                        }
+                    }
+                });
                 cancel.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
@@ -225,6 +253,46 @@ public class AddOrRemoveWallet extends AppCompatActivity {
         mAdapter = new AddorRemoveAdapter(myCardsArrayList, getApplicationContext(), walletList);
         listView.setAdapter(mAdapter);
         mAdapter.notifyDataSetChanged();
+    }
+
+    private void scanQRCode(){
+        qrScan = new IntentIntegrator(this);
+        qrScan.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE_TYPES);
+        qrScan.setPrompt("Scan Bitcoin Address");
+        qrScan.setCameraId(0);
+        qrScan.setBeepEnabled(true);
+        qrScan.setBarcodeImageEnabled(false);
+        qrScan.initiateScan();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 200:
+                boolean camera = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                if (camera) {
+                    scanQRCode();
+                }
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode,resultCode,data);
+        if (result != null){
+            if (result.getContents() == null){
+                Toast.makeText(AddOrRemoveWallet.this,"Scan Cancelled",Toast.LENGTH_SHORT).show();
+            }else {
+                String bitAdd = result.getContents();
+                bitAdd = bitAdd.replace("bitcoin:","");
+                wallet_key.setText(bitAdd);
+                Toast.makeText(AddOrRemoveWallet.this,"すごい!",Toast.LENGTH_LONG).show();
+            }
+        }else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     @Override
