@@ -6,11 +6,17 @@ import android.database.Cursor;
 import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 
+import vibhor.prakhar.example.com.nfc_tagger.Activity.MainActivity;
 import vibhor.prakhar.example.com.nfc_tagger.Model.Card;
 import vibhor.prakhar.example.com.nfc_tagger.Model.Wallet;
 
@@ -94,6 +100,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         // insert row
         long card_id = db.insert(TABLE_CARD, null, values);
+        closeDB();
 
         return card_id;
     }
@@ -122,6 +129,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
 
+        c.close();
+        closeDB();
+
         return cardList;
     }
 
@@ -135,6 +145,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         int count = cursor.getCount();
         cursor.close();
+        closeDB();
 
         // return count
         return count;
@@ -149,6 +160,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 new String[] { String.valueOf(card_id) });
         db.delete(TABLE_CARD, KEY_ID + " = ?",
                 new String[] { String.valueOf(card_id) });
+        closeDB();
     }
 
     /**
@@ -159,6 +171,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         ContentValues cv = new ContentValues();
         cv.put(KEY_CARD_NAME, cardName);
         db.update(TABLE_CARD, cv, KEY_ID+"="+card_id, null);
+        closeDB();
     }
 
 
@@ -177,6 +190,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(KEY_WALLET_KEY, wallet.getWallet_key());
 
         long id = db.insert(TABLE_WALLET, null, values);
+        closeDB();
 
         return id;
     }
@@ -205,6 +219,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             } while (c.moveToNext());
         }
 
+        c.close();
+        closeDB();
+
         return walletList;
     }
 
@@ -215,6 +232,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(TABLE_WALLET, KEY_ID + " = ?",
                 new String[] { String.valueOf(wallet_id) });
+        closeDB();
     }
 
     /**
@@ -227,6 +245,50 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(KEY_WALLET_NAME, walletName);
         cv.put(KEY_WALLET_KEY, walletKey);
         db.update(TABLE_WALLET, cv, KEY_ID+"="+wallet_id, null);
+        closeDB();
+    }
+
+    public String createBackup(){
+        String result = "";
+
+        //creating directory
+        File data = Environment.getDataDirectory();
+        File appFolder = new File(Environment.getExternalStorageDirectory() + "/Qrypto");
+        boolean success = true;
+        if (!appFolder.exists()) {
+            success = appFolder.mkdir();
+        }
+
+        if (success) {
+
+            Log.e(LOG,"directory created");
+
+            try {
+                SQLiteDatabase db = this.getWritableDatabase();
+                String dbPath = "//data//" + MainActivity.PACKAGE_NAME + "//databases//" + DATABASE_NAME;
+//                String dbPath = db.getPath();
+                Log.e("DBpath", dbPath);
+                File currentDB = new File(data, dbPath);
+                File backupDB = new File(appFolder.getPath()+"/"+DATABASE_NAME);
+
+                FileChannel src = new FileInputStream(currentDB).getChannel();
+                FileChannel dst = new FileOutputStream(backupDB).getChannel();
+                dst.transferFrom(src, 0, src.size());
+                src.close();
+                dst.close();
+                closeDB();
+                result = backupDB.getPath();
+                Log.e(LOG, "BACKUP CREATED!");
+
+            }catch (Exception e){
+                Log.e(LOG, e.toString());
+                Log.e(LOG, "BACKUP FAILED!");
+            }
+
+        } else {
+            Log.e(LOG,"could not create directory");
+        }
+        return result;
     }
 
     // closing database

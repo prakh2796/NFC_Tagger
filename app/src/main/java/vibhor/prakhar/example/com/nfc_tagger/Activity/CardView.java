@@ -152,35 +152,35 @@ public class CardView extends AppCompatActivity {
                 String type = walletList.get(i).getWallet_type();
                 if (type.matches("bitcoin")){
                     spinner.setSelection(0);
-                    scanQRbtn.setEnabled(true);
-                    scanQRbtn.setImageResource(R.drawable.camera_50);
+//                    scanQRbtn.setEnabled(true);
+//                    scanQRbtn.setImageResource(R.drawable.camera_50);
                 }else if(type.matches("blockchain")){
                     spinner.setSelection(1);
-                    scanQRbtn.setEnabled(false);
-                    scanQRbtn.setImageResource(R.drawable.no_camera_50);
+//                    scanQRbtn.setEnabled(false);
+//                    scanQRbtn.setImageResource(R.drawable.no_camera_50);
                 }
 
                 wallet_name.setText(walletList.get(i).getWallet_name());
                 wallet_key.setText(walletList.get(i).getWallet_key());
 
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                        Toast.makeText(CardView.this, "Position: " + i, Toast.LENGTH_SHORT).show();
-                        if (i==0){
-                            scanQRbtn.setEnabled(true);
-                            scanQRbtn.setImageResource(R.drawable.camera_50);
-                        }else if(i==1){
-                            scanQRbtn.setEnabled(false);
-                            scanQRbtn.setImageResource(R.drawable.no_camera_50);
-                        }
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-//                        Toast.makeText(CardView.this, "Position: ", Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                    @Override
+//                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+////                        Toast.makeText(CardView.this, "Position: " + i, Toast.LENGTH_SHORT).show();
+//                        if (i==0){
+//                            scanQRbtn.setEnabled(true);
+//                            scanQRbtn.setImageResource(R.drawable.camera_50);
+//                        }else if(i==1){
+//                            scanQRbtn.setEnabled(false);
+//                            scanQRbtn.setImageResource(R.drawable.no_camera_50);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onNothingSelected(AdapterView<?> adapterView) {
+////                        Toast.makeText(CardView.this, "Position: ", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
 
                 scanQRbtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -248,24 +248,24 @@ public class CardView extends AppCompatActivity {
                 arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinner.setAdapter(arrayAdapter);
 
-                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-//                        Toast.makeText(CardView.this, "Position: " + i, Toast.LENGTH_SHORT).show();
-                        if (i==0){
-                            scanQRbtn.setEnabled(true);
-                            scanQRbtn.setImageResource(R.drawable.camera_50);
-                        }else if(i==1){
-                            scanQRbtn.setEnabled(false);
-                            scanQRbtn.setImageResource(R.drawable.no_camera_50);
-                        }
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> adapterView) {
-//                        Toast.makeText(CardView.this, "Position: ", Toast.LENGTH_SHORT).show();
-                    }
-                });
+//                spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//                    @Override
+//                    public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+////                        Toast.makeText(CardView.this, "Position: " + i, Toast.LENGTH_SHORT).show();
+//                        if (i==0){
+//                            scanQRbtn.setEnabled(true);
+//                            scanQRbtn.setImageResource(R.drawable.camera_50);
+//                        }else if(i==1){
+//                            scanQRbtn.setEnabled(false);
+//                            scanQRbtn.setImageResource(R.drawable.no_camera_50);
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onNothingSelected(AdapterView<?> adapterView) {
+////                        Toast.makeText(CardView.this, "Position: ", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
 
                 scanQRbtn.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -382,6 +382,7 @@ public class CardView extends AppCompatActivity {
             }else {
                 String bitAdd = result.getContents();
                 bitAdd = bitAdd.replace("bitcoin:","");
+                bitAdd = bitAdd.replace("https://blockchain.info/address/","");
                 wallet_key.setText(bitAdd);
                 Toast.makeText(CardView.this,"すごい!",Toast.LENGTH_LONG).show();
             }
@@ -527,10 +528,10 @@ public class CardView extends AppCompatActivity {
 
     private NdefMessage createNdefMessage(String content){
 
-        NdefRecord ndefRecord1 = createTextRecord(content);
-        NdefRecord ndefRecord2;
+//        NdefRecord ndefRecord1 = createTextRecord(content);
+        NdefRecord ndefRecord1,ndefRecord2;
         List<NdefRecord> ndefList = new ArrayList<NdefRecord>();
-        ndefList.add(ndefRecord1);
+//        ndefList.add(ndefRecord1);
         if(walletList.size()!=0) {
             for (int i = 0; i < walletList.size(); i++) {
                 ndefRecord1 = createTextRecord(walletList.get(i).getWallet_name().toString());
@@ -540,7 +541,7 @@ public class CardView extends AppCompatActivity {
                 if (type.matches("bitcoin")){
                     url = "bitcoin:" + url;
                 }else if(type.matches("blockchain")){
-                    url = "http://blockchain.info/address/" + url;
+                    url = "https://blockchain.info/address/" + url;
                 }else {
                     url = "*something went wrong*";
                     Log.e("URL",url);

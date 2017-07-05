@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity
     private Intent intent;
     private Fragment objFragment;
     private Class fragmentClass;
+    public static String PACKAGE_NAME;
 
 //    private NfcAdapter nfcAdapter;
 
@@ -60,6 +61,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        PACKAGE_NAME = getApplicationContext().getPackageName();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
