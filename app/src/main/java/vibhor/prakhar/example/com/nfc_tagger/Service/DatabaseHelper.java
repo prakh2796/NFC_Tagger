@@ -248,6 +248,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         closeDB();
     }
 
+    /**
+     * Create backup file
+     */
     public String createBackup(){
         String result = "";
 
@@ -264,10 +267,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             Log.e(LOG,"directory created");
 
             try {
-                SQLiteDatabase db = this.getWritableDatabase();
+//                SQLiteDatabase db = this.getWritableDatabase();
                 String dbPath = "//data//" + MainActivity.PACKAGE_NAME + "//databases//" + DATABASE_NAME;
 //                String dbPath = db.getPath();
-                Log.e("DBpath", dbPath);
+//                Log.e("DBpath", dbPath);
                 File currentDB = new File(data, dbPath);
                 File backupDB = new File(appFolder.getPath()+"/"+DATABASE_NAME);
 
@@ -288,6 +291,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } else {
             Log.e(LOG,"could not create directory");
         }
+        return result;
+    }
+
+    /**
+     * Restoring from backup file
+     */
+    public boolean restoreBackup(String filePath){
+        boolean result = false;
+
+        File data = Environment.getDataDirectory();
+
+        try {
+            SQLiteDatabase db = this.getWritableDatabase();
+            String dbPath = "//data//" + MainActivity.PACKAGE_NAME + "//databases//" + DATABASE_NAME;
+            String dbPathReal = db.getPath();
+            Log.e("DBpath", dbPath);
+            Log.e("DBpathReal", dbPathReal);
+            File backupDB = new File(data, dbPath);
+            File currentDB = new File(filePath);
+
+            FileChannel src = new FileInputStream(currentDB).getChannel();
+            FileChannel dst = new FileOutputStream(backupDB).getChannel();
+            dst.transferFrom(src, 0, src.size());
+            src.close();
+            dst.close();
+            closeDB();
+            result = true;
+            Log.e(LOG, "BACKUP RESTORED!");
+
+        }catch (Exception e){
+            Log.e(LOG, e.toString());
+            Log.e(LOG, "RESTORE FAILED!");
+        }
+
         return result;
     }
 
