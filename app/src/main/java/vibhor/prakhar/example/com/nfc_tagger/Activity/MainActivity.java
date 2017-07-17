@@ -3,6 +3,7 @@ package vibhor.prakhar.example.com.nfc_tagger.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
@@ -30,6 +31,7 @@ import com.twitter.sdk.android.Twitter;
 import com.twitter.sdk.android.core.TwitterCore;
 import com.twitter.sdk.android.core.TwitterSession;
 
+import vibhor.prakhar.example.com.nfc_tagger.Fragment.NfcActions;
 import vibhor.prakhar.example.com.nfc_tagger.Service.CircleTransform;
 import vibhor.prakhar.example.com.nfc_tagger.Fragment.MyCards;
 import vibhor.prakhar.example.com.nfc_tagger.R;
@@ -195,17 +197,33 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_mycard) {
+        if (id == R.id.nav_mywallet) {
             fragmentClass = MyCards.class;
-        } else if (id == R.id.nav_profile) {
+//        } else if (id == R.id.nav_profile) {
 
         } else if (id == R.id.nav_nfc_action) {
+            fragmentClass = NfcActions.class;
+//        } else if (id == R.id.nav_buy_qrypto) {
+        } else if (id == R.id.nav_help) {
 
-        } else if (id == R.id.nav_buy_qrypto) {
+            Uri uri = Uri.parse("http://www.google.com"); // missing 'http://' will cause crashed
+            intent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(intent);
 
         } else if (id == R.id.nav_share) {
 
+            String url = "http://www.google.com";
+            intent = new Intent();
+            intent.setAction(Intent.ACTION_SEND);
+
+            // change the type of data you need to share,
+            // for image use "image/*"
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_TEXT, url);
+            startActivity(Intent.createChooser(intent, "Share"));
+
         } else if (id == R.id.nav_email) {
+
             intent = new Intent(Intent.ACTION_SEND);
             intent.setType("message/rfc822");
             intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{"recipient@example.com"});
